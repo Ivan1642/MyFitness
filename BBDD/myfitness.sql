@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-04-2026 a las 23:09:25
+-- Tiempo de generación: 23-04-2026 a las 23:31:19
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -70,7 +70,7 @@ CREATE TABLE `logros` (
 
 CREATE TABLE `publicaciones` (
   `id_publicacion` int(10) UNSIGNED NOT NULL,
-  `id_usuario` int(10) UNSIGNED DEFAULT NULL,
+  `id_usuario` int(10) UNSIGNED NOT NULL,
   `contenido` text DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `fecha` datetime DEFAULT current_timestamp()
@@ -86,7 +86,7 @@ CREATE TABLE `records` (
   `id_usuario` int(10) UNSIGNED NOT NULL,
   `id_ejercicio` int(10) UNSIGNED NOT NULL,
   `peso_max` decimal(6,2) NOT NULL,
-  `fecha` datetime DEFAULT NULL
+  `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -137,7 +137,7 @@ CREATE TABLE `series` (
   `id_sesion` int(10) UNSIGNED NOT NULL,
   `id_ejercicio` int(10) UNSIGNED NOT NULL,
   `repeticiones` tinyint(3) UNSIGNED NOT NULL,
-  `peso` decimal(10,0) NOT NULL
+  `peso` decimal(6,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -224,8 +224,8 @@ ALTER TABLE `rutinas`
 -- Indices de la tabla `rutina_ejercicio`
 --
 ALTER TABLE `rutina_ejercicio`
-  ADD KEY `fk_rutina_ejercicio_id_ejercicio` (`id_ejercicio`),
-  ADD KEY `fk_rutina_ejercicio_id_rutina` (`id_rutina`);
+  ADD PRIMARY KEY (`id_rutina`,`id_ejercicio`),
+  ADD KEY `fk_rutina_ejercicio_id_ejercicio` (`id_ejercicio`);
 
 --
 -- Indices de la tabla `seguidores`
