@@ -1,8 +1,9 @@
-<header class="bg-[#003942] text-white shadow-md">
+<header id="main-header"
+    class="bg-[#003942] text-white shadow-md fixed top-0 left-0 w-full z-50 transition-all duration-300">
 
     <div class="container mx-auto flex justify-between items-center p-2">
 
-        <a href="/" class="flex items-center">
+        <a href="{{ url('/') }}" class="flex items-center">
             <img src="{{ asset('img/logoMyFitness.png') }}" class="h-20 w-auto" alt="MyFitness">
         </a>
 
@@ -18,11 +19,11 @@
         <div class="flex items-center space-x-4">
 
             @guest
-                <a href="/login" class="bg-white text-[#003942] px-3 py-1 rounded">
-                    Login
+                <a href="{{ url('/login') }}" class="border border-white text-white px-3 py-1 rounded hover:bg-white hover:text-[#003942] transition">
+                    Iniciar Sesión
                 </a>
 
-                <a href="/register" class="border border-white px-3 py-1 rounded">
+                <a href="{{ url('/register') }}" class="border border-white px-3 py-1 rounded hover:bg-white hover:text-[#003942] transition">
                     Registro
                 </a>
             @endguest
@@ -67,3 +68,25 @@
     </div>
 
 </header>
+
+<div class="h-24"></div>
+
+<script>
+const header = document.getElementById('main-header');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+        header.classList.add(
+            'bg-[#003942]/95',
+            'backdrop-blur-md',
+            'shadow-lg'
+        );
+    } else {
+        header.classList.remove(
+            'bg-[#003942]/95',
+            'backdrop-blur-md',
+            'shadow-lg'
+        );
+    }
+});
+</script>

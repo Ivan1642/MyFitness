@@ -7,7 +7,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-white text[#003942] min-h-screen flex flex-col">
+<body class="bg-white text-[#003942] min-h-screen flex flex-col">
 
     {{-- Navbar / Header --}}
     @include('partials.navbar')
