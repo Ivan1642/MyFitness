@@ -27,21 +27,21 @@
 <div class="grid md:grid-cols-3 gap-6 mt-12">
 
     <div class="bg-white p-6 rounded shadow text-center">
-        <h2 class="font-knewave text-xl mb-2 text-[#003942]">📊 Progreso real</h2>
+        <h2 class="font-knewave text-xl mb-2 text-[#003942]">Progreso real</h2>
         <p class="text-[#003942] opacity-70">
             Controla tus marcas y evolución en el gimnasio.
         </p>
     </div>
 
     <div class="bg-white p-6 rounded shadow text-center">
-        <h2 class="font-knewave text-xl mb-2 text-[#003942]">🏋️ Entrenamientos</h2>
+        <h2 class="font-knewave text-xl mb-2 text-[#003942]">Entrenamientos</h2>
         <p class="text-[#003942] opacity-70">
             Crea rutinas y registra cada serie fácilmente.
         </p>
     </div>
 
     <div class="bg-white p-6 rounded shadow text-center">
-        <h2 class="font-knewave text-xl mb-2 text-[#003942]">👥 Comunidad</h2>
+        <h2 class="font-knewave text-xl mb-2 text-[#003942]">Comunidad</h2>
         <p class="text-[#003942] opacity-70">
             Sigue a otros usuarios y comparte tus logros.
         </p>
