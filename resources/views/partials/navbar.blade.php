@@ -1,10 +1,10 @@
 <header id="main-header"
-    class="bg-[#003942] text-white shadow-md fixed top-0 left-0 w-full z-50 transition-all duration-300">
+    class="text-[#003942] bg-white shadow-md fixed top-0 left-0 w-full z-50 transition-all duration-300">
 
     <div class="container mx-auto flex justify-between items-center p-2">
 
         <a href="{{ url('/') }}" class="flex items-center">
-            <img src="{{ asset('img/logoMyFitness.png') }}" class="h-20 w-auto" alt="MyFitness">
+            <img src="{{ asset('img/logoMyFitness2.png') }}" class="h-20 w-auto" alt="MyFitness">
         </a>
 
         @auth
@@ -19,11 +19,11 @@
         <div class="flex items-center space-x-4">
 
             @guest
-                <a href="{{ url('/login') }}" class="border border-white text-white px-3 py-1 rounded hover:bg-white hover:text-[#003942] transition">
+                <a href="{{ url('/login') }}" class="border border-[#003942] text-[#003942] px-3 py-1 rounded hover:text-white font-bold hover:bg-[#003942] transition">
                     Iniciar Sesión
                 </a>
 
-                <a href="{{ url('/register') }}" class="border border-white px-3 py-1 rounded hover:bg-white hover:text-[#003942] transition">
+                <a href="{{ url('/register') }}" class="border border-[#003942] px-3 py-1 rounded hover:bg-[#003942] hover:text-white font-bold transition">
                     Registro
                 </a>
             @endguest
