@@ -51,16 +51,16 @@
                          x-transition
                          class="absolute right-0 mt-2 w-48 bg-white text-[#003942] rounded shadow-lg z-50">
 
-                            <a href="/" class="block px-4 py-2 hover:bg-gray-100">
+                            <a href="/" class="block md:hidden px-4 py-2 hover:bg-gray-100">
                                 Inicio
                             </a>
-                            <a href="/rutinas" class="block px-4 py-2 hover:bg-gray-100">
+                            <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100">
                                 Rutinas
                             </a>
-                            <a href="/progreso" class="block px-4 py-2 hover:bg-gray-100">
+                            <a href="/progreso" class="block md:hidden px-4 py-2 hover:bg-gray-100">
                                 Progreso
                             </a>
-                            <a href="/feed" class="block px-4 py-2 hover:bg-gray-100">
+                            <a href="/feed" class="block md:hidden px-4 py-2 hover:bg-gray-100">
                                 Feed
                             </a>
 
@@ -87,23 +87,3 @@
 </header>
 
 <div class="h-24"></div>
-
-<script>
-    const header = document.getElementById('main-header');
-
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 10) {
-            header.classList.add(
-                'bg-[#003942]/95',
-                'backdrop-blur-md',
-                'shadow-lg'
-            );
-        } else {
-            header.classList.remove(
-                'bg-[#003942]/95',
-                'backdrop-blur-md',
-                'shadow-lg'
-            );
-        }
-    });
-</script>
