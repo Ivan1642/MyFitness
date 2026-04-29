@@ -2,15 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TrainingSessionController;
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
+//Autenticaciones
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 
@@ -18,3 +21,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/training/start', [TrainingSessionController::class, 'create'])
+    ->name('training.start')
+    ->middleware('auth');

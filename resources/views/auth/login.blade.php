@@ -14,6 +14,11 @@
             Accede a tu cuenta y continúa tu progreso
         </p>
 
+        @if ($errors->any())
+            <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                {{ $errors->first() }}
+            </div>
+        @endif
         <form method="POST" action="{{ url('/login') }}" class="space-y-4">
             @csrf
 
@@ -21,7 +26,7 @@
                 <label class="block text-sm font-medium text-[#003942]">
                     Email
                 </label>
-                <input type="email" name="email"
+                <input type="email" name="email" value="{{ old('email') }}"
                     class="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#003942]">
             </div>
 

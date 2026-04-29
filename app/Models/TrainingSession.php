@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Routine;
+use App\Models\Set;
 
 class TrainingSession extends Model
 {
@@ -17,6 +20,10 @@ class TrainingSession extends Model
         'photo',
     ];
 
+    protected $casts = [
+        'date' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -29,6 +36,6 @@ class TrainingSession extends Model
 
     public function sets()
     {
-        return $this->hasMany(SetModel::class, 'training_session_id');
+        return $this->hasMany(Set::class, 'training_session_id');
     }
 }
