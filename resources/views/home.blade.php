@@ -14,11 +14,11 @@
             </p>
 
             <div class="space-x-4">
-                <a href="{{ url('/register') }}" class="bg-[#003942] text-white px-6 py-3 rounded">
+                <a href="{{ url('/register') }}" class="bg-[#003942] text-white hover:text-[#003942] hover:bg-white border px-6 py-3 rounded">
                     Empieza gratis
                 </a>
 
-                <a href="{{ url('/login') }}" class="border border-[#003942] text-[#003942] px-6 py-3 rounded">
+                <a href="{{ url('/login') }}" class="border border-[#003942] text-[#003942] hover:text-white hover:bg-[#003942] px-6 py-3 rounded">
                     Iniciar sesión
                 </a>
             </div>
@@ -32,25 +32,67 @@
 
 <div class="grid md:grid-cols-3 gap-6 mt-12">
 
-    <div class="bg-white p-6 rounded shadow text-center">
-        <h2 class="font-merri font-bold text-xl mb-2 text-black">Progreso real</h2>
+    <div class="bg-white p-6 rounded shadow-xl text-center hover:shadow-2xl transition">
+
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#003942]/10 flex items-center justify-center shadow-md">
+
+            <span class="material-symbols-outlined text-[#003942]"
+                  style="font-size: 36px;">
+                monitoring
+            </span>
+
+        </div>
+
+        <h2 class="font-merri font-bold text-xl mb-2 text-black">
+            Progreso real
+        </h2>
+
         <p class="text-black font-medium opacity-70">
             Controla tus marcas y evolución en el gimnasio.
         </p>
+
     </div>
 
-    <div class="bg-white p-6 rounded shadow text-center">
-        <h2 class="font-merri font-bold text-xl mb-2 text-black">Entrenamientos</h2>
+    <div class="bg-white p-6 rounded shadow-xl text-center hover:shadow-2xl transition">
+
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#003942]/10 flex items-center justify-center shadow-md">
+
+            <span class="material-symbols-outlined text-[#003942]"
+                  style="font-size: 36px;">
+                fitness_center
+            </span>
+
+        </div>
+
+        <h2 class="font-merri font-bold text-xl mb-2 text-black">
+            Entrenamientos
+        </h2>
+
         <p class="text-black font-medium opacity-70">
             Crea rutinas y registra cada serie fácilmente.
         </p>
+
     </div>
 
-    <div class="bg-white p-6 rounded shadow text-center">
-        <h2 class="font-merri font-bold text-xl mb-2 text-black">Comunidad</h2>
+    <div class="bg-white p-6 rounded shadow-xl text-center hover:shadow-2xl transition">
+
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[#003942]/10 flex items-center justify-center shadow-md">
+
+            <span class="material-symbols-outlined text-[#003942]"
+                  style="font-size: 36px;">
+                groups
+            </span>
+
+        </div>
+
+        <h2 class="font-merri font-bold text-xl mb-2 text-black">
+            Comunidad
+        </h2>
+
         <p class="text-black font-medium opacity-70">
             Sigue a otros usuarios y comparte tus logros.
         </p>
+
     </div>
 
 </div>
@@ -65,7 +107,7 @@
         Empieza a entrenar de forma inteligente hoy mismo.
     </p>
 
-    <a href="/register" class="bg-white text-[#003942] px-6 py-3 rounded font-bold">
+    <a href="{{ url('/register') }}" class="border bg-white hover:bg-[#003942] text-[#003942] hover:text-white px-6 py-3 rounded font-bold">
         Crear cuenta
     </a>
 

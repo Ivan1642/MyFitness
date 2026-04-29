@@ -1,33 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
-//landing
 Route::get('/', function () {
     return view('home');
-});
-//dashboard (solo logueado)
+})->name('home');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware('auth');
-//registro
-Route::get('/register', function () {
-    return view('auth.register');
-});
+})->middleware('auth')->name('dashboard');
 
-Route::post('/register', function () {
-    // aquí irá la lógica de crear usuario
-});
-//inicio de sesión
-Route::get('/login', function () {
-    return view('auth.login');
-});
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 
-Route::post('/login', function () {
-    // aquí irá la lógica de login
-});
-//cerrar sesión
-Route::post('/logout', function () {
-    auth()->logout();
-    return redirect('/');
-});
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

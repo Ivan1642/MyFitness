@@ -14,7 +14,7 @@
             Empieza a registrar tus entrenamientos y mejorar tu progreso
         </p>
 
-        <form method="POST" action="/register" class="space-y-4">
+        <form method="POST" action="{{ url('/register') }}" class="space-y-4">
             @csrf
 
             <div>
