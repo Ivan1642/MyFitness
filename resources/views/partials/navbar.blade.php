@@ -31,7 +31,7 @@
             @auth
                 <div class="relative" x-data="{ open: false }">
 
-                    <button @click="open = !open" class="flex items-center space-x-2">
+                    <button @click="open = !open" class="flex items-center space-x-2 cursor-pointer">
 
                         <span>{{ auth()->user()->name }}</span>
 
@@ -51,26 +51,26 @@
                          x-transition
                          class="absolute right-0 mt-2 w-48 bg-white text-[#003942] rounded shadow-lg z-50">
 
-                            <a href="/" class="block md:hidden px-4 py-2 hover:bg-gray-100">
+                            <a href="/" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Inicio
                             </a>
-                            <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100">
+                            <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Rutinas
                             </a>
-                            <a href="/progreso" class="block md:hidden px-4 py-2 hover:bg-gray-100">
+                            <a href="/progreso" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Progreso
                             </a>
-                            <a href="/feed" class="block md:hidden px-4 py-2 hover:bg-gray-100">
+                            <a href="/feed" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Feed
                             </a>
 
-                        <a href="/profile" class="block px-4 py-2 hover:bg-gray-100">
+                        <a href="/profile" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Perfil
                         </a>
 
                         <form method="POST" action="{{ url('/logout') }}">
                             @csrf
-                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Logout
                             </button>
                         </form>

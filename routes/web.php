@@ -5,10 +5,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrainingSessionController;
 
+//landing sin loguear
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Landing logueado
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
@@ -22,6 +24,9 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/training/start', [TrainingSessionController::class, 'create'])
+//Entrenamiento
+Route::get('/training/start', [TrainingSessionController::class, 'start'])
     ->name('training.start')
     ->middleware('auth');
+
+Route::post('/api/training/set', [TrainingSessionController::class, 'storeSet']);
