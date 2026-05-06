@@ -1,14 +1,12 @@
-console.log("training.js cargado");
+const CSRF = () => document.querySelector('meta[name="csrf-token"]').content;
 
 let sessionId = null;
 let exercisesDB = [];
-let selectedExercise = null;
-let sets = [];
+let exerciseBlocks = [];
 
 window.addEventListener("DOMContentLoaded", async () => {
 
     const el = document.getElementById("training-app");
-
     if (!el) return;
 
     try {
@@ -21,156 +19,232 @@ window.addEventListener("DOMContentLoaded", async () => {
     render();
 
     function render() {
-
         el.innerHTML = `
-            <div class="max-w-3xl mx-auto p-4 space-y-4">
+            <div class="space-y-4 pb-24">
+                ${!sessionId ? renderStartBanner() : ''}
+                ${sessionId ? renderExerciseBlocks() : ''}
+                ${sessionId ? renderAddExercise() : ''}
+                ${sessionId ? renderFinishButton() : ''}
+            </div>
+        `;
+        bindEvents();
+    }
 
-                <div class="bg-[#003942] text-white p-4 rounded-xl shadow flex justify-between items-center">
+    function renderStartBanner() {
+        return `
+            <div class="bg-[#003942] text-white p-6 rounded-2xl shadow-lg text-center">
+                <span class="material-symbols-outlined text-4xl mb-2 block opacity-80">fitness_center</span>
+                <h2 class="text-xl font-bold mb-1">¿Listo para entrenar?</h2>
+                <p class="text-white/60 text-sm mb-6">Pulsa el botón para comenzar a registrar tu entrenamiento</p>
+                <button id="startSession"
+                    class="bg-white text-[#003942] px-8 py-4 rounded-xl font-bold text-lg w-full active:scale-95 transition">
+                    Comenzar entrenamiento
+                </button>
+            </div>
+        `;
+    }
 
-                    <div>
-                        <h1 class="text-lg font-bold">Entrenamiento</h1>
-                        <p class="text-sm opacity-80">
-                            ${sessionId ? "Sesión activa" : "Sin iniciar"}
-                        </p>
-                    </div>
-
-                    <button id="startSession"
-                        class="bg-white text-[#003942] px-3 py-1 rounded-lg font-semibold">
-                        ${sessionId ? "Iniciada" : "Iniciar"}
-                    </button>
-
-                </div>
-
-                <div class="bg-white p-4 rounded-xl shadow space-y-3">
-
-                    <select id="exerciseSelect"
-                        class="w-full border rounded-lg p-2">
-
-                        <option value="">Selecciona ejercicio</option>
-
-                        ${exercisesDB.map(e => `
-                            <option value="${e.id}">
-                                ${e.name}
-                            </option>
-                        `).join("")}
-
-                    </select>
-
-                    <button id="addSet"
-                        class="w-full bg-black text-white py-2 rounded-lg">
-                        Añadir serie
-                    </button>
-
-                </div>
-
-                <div class="space-y-3">
-
-                    ${sets.map((set, i) => `
-                        <div class="flex gap-2 items-center bg-white p-3 rounded-lg shadow">
-
-                            <input type="number"
-                                placeholder="Reps"
-                                value="${set.reps}"
-                                class="border p-2 w-20 rounded"
-                                data-i="${i}"
-                                data-f="reps">
-
-                            <input type="number"
-                                placeholder="Peso"
-                                value="${set.weight}"
-                                class="border p-2 w-20 rounded"
-                                data-i="${i}"
-                                data-f="weight">
-
-                            <button data-save="${i}"
-                                class="bg-[#003942] text-white px-3 py-2 rounded">
-                                Guardar
-                            </button>
-
-                        </div>
-                    `).join("")}
-
-                </div>
-
+    function renderExerciseBlocks() {
+        if (exerciseBlocks.length === 0) return `
+            <div class="text-center text-gray-400 py-10">
+                <span class="material-symbols-outlined text-5xl mb-3 block">add_circle</span>
+                <p class="font-medium">Añade tu primer ejercicio</p>
             </div>
         `;
 
-        bindEvents();
+        return exerciseBlocks.map((block, bi) => `
+            <div class="bg-white rounded-2xl shadow overflow-hidden">
+
+                <div class="bg-[#003942] px-4 py-3 flex justify-between items-center">
+                    <h3 class="font-bold text-white text-base">${block.name}</h3>
+                    <button data-remove-block="${bi}"
+                        class="text-white/50 hover:text-white text-sm transition">
+                        Eliminar
+                    </button>
+                </div>
+
+                <div class="p-4 space-y-3">
+
+                    <div class="grid grid-cols-12 gap-2 text-xs text-gray-400 font-semibold uppercase px-1 mb-1">
+                        <span class="col-span-2 text-center">Serie</span>
+                        <span class="col-span-4 text-center">Reps</span>
+                        <span class="col-span-4 text-center">Kg</span>
+                        <span class="col-span-2"></span>
+                    </div>
+
+                    ${block.sets.map((set, si) => `
+                        <div class="grid grid-cols-12 gap-2 items-center">
+
+                            <span class="col-span-2 text-center font-bold text-[#003942] text-lg">
+                                ${si + 1}
+                            </span>
+
+                            <input type="number"
+                                inputmode="numeric"
+                                placeholder="—"
+                                value="${set.reps}"
+                                min="1"
+                                class="col-span-4 border-2 ${set.saved ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-200 focus:border-[#003942]'} rounded-xl p-3 text-center text-lg font-bold focus:outline-none transition"
+                                data-bi="${bi}" data-si="${si}" data-f="reps"
+                                ${set.saved ? 'readonly' : ''}>
+
+                            <input type="number"
+                                inputmode="decimal"
+                                placeholder="—"
+                                value="${set.weight}"
+                                min="0" step="0.5"
+                                class="col-span-4 border-2 ${set.saved ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-200 focus:border-[#003942]'} rounded-xl p-3 text-center text-lg font-bold focus:outline-none transition"
+                                data-bi="${bi}" data-si="${si}" data-f="weight"
+                                ${set.saved ? 'readonly' : ''}>
+
+                            <button data-save-bi="${bi}" data-save-si="${si}"
+                                class="col-span-2 flex items-center justify-center h-12 rounded-xl font-bold transition active:scale-95
+                                ${set.saved ? 'bg-green-100 text-green-600' : 'bg-[#003942] text-white'}">
+                                ${set.saved
+                                    ? '<span class="material-symbols-outlined text-xl">check</span>'
+                                    : '<span class="material-symbols-outlined text-xl">arrow_forward</span>'
+                                }
+                            </button>
+
+                        </div>
+                    `).join('')}
+
+                    <button data-add-set="${bi}"
+                        class="w-full border-2 border-dashed border-[#003942]/30 hover:border-[#003942] text-[#003942] py-3 rounded-xl font-semibold text-sm transition mt-1">
+                        + Añadir serie
+                    </button>
+
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderAddExercise() {
+        return `
+            <div class="bg-white rounded-2xl shadow p-4 space-y-3">
+                <select id="exerciseSelect"
+                    class="w-full border-2 border-gray-200 rounded-xl p-4 text-[#003942] font-semibold focus:border-[#003942] focus:outline-none transition">
+                    <option value="">Selecciona un ejercicio...</option>
+                    ${exercisesDB.map(e => `
+                        <option value="${e.id}" data-name="${e.name}">${e.name}</option>
+                    `).join('')}
+                </select>
+                <button id="addExercise"
+                    class="w-full bg-[#003942] text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition">
+                    + Añadir ejercicio
+                </button>
+            </div>
+        `;
+    }
+
+    function renderFinishButton() {
+        return `
+            <button id="finishSession"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition shadow-lg">
+                Finalizar entrenamiento
+            </button>
+        `;
     }
 
     function bindEvents() {
 
-        const startBtn = document.getElementById("startSession");
-
-        startBtn.onclick = async () => {
-
-            const res = await fetch("/training/session", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+        const startBtn = document.getElementById('startSession');
+        if (startBtn) {
+            startBtn.onclick = async () => {
+                startBtn.disabled = true;
+                startBtn.textContent = 'Iniciando...';
+                try {
+                    const res = await fetch('/training/session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() }
+                    });
+                    if (!res.ok) throw new Error();
+                    const data = await res.json();
+                    sessionId = data.session_id;
+                    render();
+                } catch (e) {
+                    alert('No se pudo iniciar el entrenamiento. Inténtalo de nuevo.');
+                    startBtn.disabled = false;
+                    startBtn.textContent = 'Comenzar entrenamiento';
                 }
-            });
+            };
+        }
 
-            const data = await res.json();
-            sessionId = data.session_id;
+        const addExBtn = document.getElementById('addExercise');
+        if (addExBtn) {
+            addExBtn.onclick = () => {
+                const select = document.getElementById('exerciseSelect');
+                const id = select.value;
+                const name = select.options[select.selectedIndex]?.dataset.name;
+                if (!id) { alert('Selecciona un ejercicio primero'); return; }
+                exerciseBlocks.push({ exercise_id: id, name, sets: [{ reps: '', weight: '', saved: false }] });
+                select.value = '';
+                render();
+            };
+        }
 
-            render();
-        };
+        document.querySelectorAll('[data-add-set]').forEach(btn => {
+            btn.onclick = (e) => {
+                const bi = e.currentTarget.dataset.addSet;
+                exerciseBlocks[bi].sets.push({ reps: '', weight: '', saved: false });
+                render();
+            };
+        });
 
-        const select = document.getElementById("exerciseSelect");
+        document.querySelectorAll('[data-remove-block]').forEach(btn => {
+            btn.onclick = (e) => {
+                const bi = e.currentTarget.dataset.removeBlock;
+                if (confirm('¿Eliminar este ejercicio y todas sus series?')) {
+                    exerciseBlocks.splice(bi, 1);
+                    render();
+                }
+            };
+        });
 
-        select.onchange = (e) => {
-            selectedExercise = e.target.value;
-        };
-
-        document.getElementById("addSet").onclick = () => {
-
-            if (!selectedExercise) return;
-
-            sets.push({
-                exercise_id: selectedExercise,
-                reps: "",
-                weight: ""
-            });
-
-            render();
-        };
-
-        document.querySelectorAll("input[data-i]").forEach(input => {
-
+        document.querySelectorAll('input[data-bi]').forEach(input => {
             input.oninput = (e) => {
-
-                const i = e.target.dataset.i;
-                const f = e.target.dataset.f;
-
-                sets[i][f] = e.target.value;
+                const { bi, si, f } = e.target.dataset;
+                exerciseBlocks[bi].sets[si][f] = e.target.value;
             };
         });
 
-        document.querySelectorAll("button[data-save]").forEach(btn => {
-
+        document.querySelectorAll('[data-save-bi]').forEach(btn => {
             btn.onclick = async (e) => {
+                const bi = e.currentTarget.dataset.saveBi;
+                const si = e.currentTarget.dataset.saveSi;
+                const set = exerciseBlocks[bi].sets[si];
 
-                const i = e.target.dataset.save;
-                const set = sets[i];
+                if (set.saved) return;
+                if (!set.reps || !set.weight) {
+                    alert('Rellena repeticiones y peso antes de guardar');
+                    return;
+                }
 
-                await fetch("/training/set", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        session_id: sessionId,
-                        exercise_id: set.exercise_id,
-                        repetitions: set.reps,
-                        weight: set.weight
-                    })
-                });
-
-                console.log("set guardado");
+                try {
+                    const res = await fetch('/training/set', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+                        body: JSON.stringify({
+                            session_id:  sessionId,
+                            exercise_id: exerciseBlocks[bi].exercise_id,
+                            repetitions: set.reps,
+                            weight:      set.weight
+                        })
+                    });
+                    if (!res.ok) throw new Error();
+                    exerciseBlocks[bi].sets[si].saved = true;
+                    render();
+                } catch (e) {
+                    alert('Error al guardar la serie. Inténtalo de nuevo.');
+                }
             };
         });
+
+        const finishBtn = document.getElementById('finishSession');
+        if (finishBtn) {
+            finishBtn.onclick = () => {
+                alert('Funcionalidad de finalizar próximamente');
+            };
+        }
     }
 });

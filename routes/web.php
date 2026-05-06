@@ -24,9 +24,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-//Entrenamiento
-Route::get('/training/start', [TrainingSessionController::class, 'start'])
-    ->name('training.start')
-    ->middleware('auth');
-
-Route::post('/api/training/set', [TrainingSessionController::class, 'storeSet']);
+Route::middleware('auth')->group(function () {
+    Route::get('/training/start', [TrainingSessionController::class, 'start'])->name('training.start');
+    Route::post('/training/session', [TrainingSessionController::class, 'store'])->name('training.session');
+    Route::post('/training/set', [TrainingSessionController::class, 'storeSet'])->name('training.set');
+});
