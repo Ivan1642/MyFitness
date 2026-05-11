@@ -14,18 +14,33 @@
             Empieza a registrar tus entrenamientos y mejorar tu progreso
         </p>
 
+        @if ($errors->any())
+            <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <form method="POST" action="{{ url('/register') }}" class="space-y-4">
             @csrf
 
             <div>
                 <label class="block text-sm font-medium text-[#003942]">Nombre</label>
-                <input type="text" name="name"
+                <input type="text" name="name" value="{{ old('name') }}"
                     class="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#003942]">
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-[#003942]">Nombre de usuario</label>
+                <div class="flex items-center mt-1 border rounded focus-within:ring-2 focus-within:ring-[#003942]">
+                    <span class="px-3 text-gray-400 font-medium">@</span>
+                    <input type="text" name="username" value="{{ old('username') }}"
+                        class="w-full p-2 focus:outline-none rounded-r">
+                </div>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-[#003942]">Email</label>
-                <input type="email" name="email"
+                <input type="email" name="email" value="{{ old('email') }}"
                     class="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#003942]">
             </div>
 

@@ -2,32 +2,33 @@
 
 @section('content')
 
-<div class="flex w-12/12">
-        <div class="flex flex-col items-center mitad-w py-20 bg-white rounded">
+<div class="flex w-full -mt-4">
+    <div class="flex flex-col items-center mitad-w py-20 bg-white">
 
-            <a href="{{ url('/') }}" class="mb-4">
-                <img src="{{ asset('img/logoMyFitness2.png') }}" class="h-60 w-auto" alt="MyFitness">
+        <a href="{{ url('/') }}" class="mb-4">
+            <img src="{{ asset('img/logoMyFitness2.png') }}" class="h-60 w-auto" alt="MyFitness">
+        </a>
+
+        <p class="text-black text-lg text-center mb-10 max-w-xl mx-auto opacity-80">
+            Registra tus entrenamientos, supera tus marcas personales y sigue tu progreso como nunca antes.
+        </p>
+
+        <div class="space-x-4">
+            <a href="{{ url('/register') }}" class="bg-[#003942] text-white hover:text-[#003942] hover:bg-white border px-6 py-3 rounded">
+                Empieza gratis
             </a>
-
-            <p class="text-black text-lg text-center mb-10 max-w-xl mx-auto opacity-80">
-                Registra tus entrenamientos, supera tus marcas personales y sigue tu progreso como nunca antes.
-            </p>
-
-            <div class="space-x-4">
-                <a href="{{ url('/register') }}" class="bg-[#003942] text-white hover:text-[#003942] hover:bg-white border px-6 py-3 rounded">
-                    Empieza gratis
-                </a>
-
-                <a href="{{ url('/login') }}" class="border border-[#003942] text-[#003942] hover:text-white hover:bg-[#003942] px-6 py-3 rounded">
-                    Iniciar sesión
-                </a>
-            </div>
-
+            <a href="{{ url('/login') }}" class="border border-[#003942] text-[#003942] hover:text-white hover:bg-[#003942] px-6 py-3 rounded">
+                Iniciar sesión
+            </a>
         </div>
 
-        <a class="mitad-w">
-            <img src="{{ asset('img/img_portada.png') }}" alt="MyFitness">
-        </a>
+    </div>
+
+    <div class="mitad-w relative overflow-hidden">
+        <div class="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white to-transparent z-10"></div>
+        <div class="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white to-transparent z-10"></div>
+        <img src="{{ asset('img/img_portada.png') }}" alt="MyFitness" class="w-full h-full object-cover object-center">
+    </div>
 </div>
 
 <div class="grid md:grid-cols-3 gap-6 mt-12">

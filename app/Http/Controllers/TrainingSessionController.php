@@ -57,13 +57,20 @@ class TrainingSessionController extends Controller
         $request->validate([
             'notes'    => 'nullable|string|max:500',
             'duration' => 'nullable|integer|min:1',
+            'photo'    => 'nullable|image|max:4096',
         ]);
 
-        $session->update([
+        $data = [
             'notes'       => $request->notes,
-            'duration'    => $request->duration,
+            'duration'    => $request->duration ?: null,
             'is_finished' => true,
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('training_photos', 'public');
+        }
+
+        $session->update($data);
 
         return response()->json(['ok' => true]);
     }

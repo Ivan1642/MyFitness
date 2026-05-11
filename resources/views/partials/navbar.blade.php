@@ -9,7 +9,7 @@
 
         @auth
             <nav class="hidden md:flex space-x-6">
-                <a href="/" class="hover:text-black hover:underline">Inicio</a>
+                <a href="{{ route('dashboard') }}" class="hover:text-black hover:underline">Inicio</a>
                 <a href="/rutinas" class="hover:text-black hover:underline">Rutinas</a>
                 <a href="/progreso" class="hover:text-black hover:underline">Progreso</a>
                 <a href="/feed" class="hover:text-black hover:underline">Feed</a>
@@ -19,11 +19,11 @@
         <div class="flex items-center space-x-4">
 
             @guest
-                <a href="{{ url('/login') }}" class="border text-white px-3 py-1 rounded hover:text-[#003942] font-bold bg-[#003942] hover:bg-white transition">
+                <a href="{{ route('login') }}" class="border text-white px-3 py-1 rounded hover:text-[#003942] font-bold bg-[#003942] hover:bg-white transition">
                     Iniciar Sesión
                 </a>
 
-                <a href="{{ url('/register') }}" class="border border-[#003942] px-3 py-1 rounded hover:bg-[#003942] hover:text-white font-bold transition">
+                <a href="{{ route('register') }}" class="border border-[#003942] px-3 py-1 rounded hover:bg-[#003942] hover:text-white font-bold transition">
                     Registro
                 </a>
             @endguest
@@ -37,8 +37,8 @@
 
                         <div class="h-16 w-16 rounded-full overflow-hidden relative flex items-center justify-center">
                             <img
-                                src="{{ auth()->user()->avatar 
-                                    ? asset('storage/' . auth()->user()->avatar) 
+                                src="{{ auth()->user()->avatar
+                                    ? asset('storage/' . auth()->user()->avatar)
                                     : asset('img/predeterminada_perfil.png') }}"
                                 class="absolute inset-0 h-full w-full object-cover object-center scale-[101%]"
                                 alt="Avatar">
@@ -51,24 +51,24 @@
                          x-transition
                          class="absolute right-0 mt-2 w-48 bg-white text-[#003942] rounded shadow-lg z-50">
 
-                            <a href="/dashboard" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                Inicio
-                            </a>
-                            <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                Rutinas
-                            </a>
-                            <a href="/progreso" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                Progreso
-                            </a>
-                            <a href="/feed" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                Feed
-                            </a>
+                        <a href="{{ route('dashboard') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            Inicio
+                        </a>
+                        <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            Rutinas
+                        </a>
+                        <a href="/progreso" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            Progreso
+                        </a>
+                        <a href="/feed" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            Feed
+                        </a>
 
-                        <a href="/profile" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <a href="{{ route('profile') }}" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Perfil
                         </a>
 
-                        <form method="POST" action="{{ url('/logout') }}">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button class="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Cerrar Sesión

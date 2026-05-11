@@ -15,6 +15,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'weight',
+        'height',
+        'bio',
+        'username',
     ];
 
     public function trainingSessions()

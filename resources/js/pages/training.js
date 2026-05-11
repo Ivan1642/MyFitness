@@ -199,10 +199,15 @@ window.addEventListener("DOMContentLoaded", async () => {
         modal.innerHTML = `
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
                 <h2 class="text-xl font-bold text-[#003942]">Finalizar entrenamiento</h2>
-                <p class="text-gray-500 text-sm">¿Quieres añadir alguna nota sobre el entrenamiento?</p>
+                <p class="text-gray-500 text-sm">Añade una nota o foto opcional antes de guardar.</p>
                 <textarea id="session-notes"
                     placeholder="Ej: Me sentí con mucha energía, aumenté el peso en press banca..."
                     class="w-full border-2 border-gray-200 focus:border-[#003942] rounded-xl p-3 text-sm focus:outline-none transition resize-none h-28"></textarea>
+                <div>
+                    <label class="block text-sm font-medium text-[#003942] mb-1">Foto del entrenamiento (opcional)</label>
+                    <input type="file" id="session-photo" accept="image/*"
+                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#003942] file:text-white hover:file:bg-[#002a31]">
+                </div>
                 <div class="flex gap-3">
                     <button id="modal-cancel"
                         class="flex-1 border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
@@ -221,13 +226,19 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         document.getElementById('modal-confirm').onclick = async () => {
             const notes = document.getElementById('session-notes').value;
+            const photo = document.getElementById('session-photo').files[0];
             const duration = sessionStart ? Math.round((Date.now() - sessionStart) / 60000) : null;
+
+            const formData = new FormData();
+            formData.append('notes', notes);
+            formData.append('duration', duration ?? '');
+            if (photo) formData.append('photo', photo);
 
             try {
                 const res = await fetch(`${window.APP_URL}/training/session/${sessionId}/finish`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
-                    body: JSON.stringify({ notes, duration })
+                    headers: { 'X-CSRF-TOKEN': CSRF() },
+                    body: formData
                 });
                 if (!res.ok) throw new Error();
                 clearState();

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrainingSessionController;
+use App\Http\Controllers\ProfileController;
 
 //landing sin loguear
 Route::get('/', function () {
@@ -32,6 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/training/session/{id}/finish', [TrainingSessionController::class, 'finish'])->name('training.finish');
     Route::delete('/training/session/{id}', [TrainingSessionController::class, 'destroy'])->name('training.destroy');
     Route::patch('/training/session/{id}/visibility', [TrainingSessionController::class, 'toggleVisibility'])->name('training.visibility');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/training/session/{id}', [TrainingSessionController::class, 'show'])->name('training.show');
 });
 
 //API ejercicios
