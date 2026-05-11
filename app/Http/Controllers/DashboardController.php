@@ -12,10 +12,12 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $sessionsThisWeek = $user->trainingSessions()
+            ->where('is_finished', true)
             ->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->count();
 
         $volumeThisMonth = $user->trainingSessions()
+            ->where('is_finished', true)
             ->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
             ->with('sets')
             ->get()
@@ -23,6 +25,7 @@ class DashboardController extends Controller
             ->sum(fn($set) => $set->weight * $set->repetitions);
 
         $volumeLastMonth = $user->trainingSessions()
+            ->where('is_finished', true)
             ->whereBetween('date', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
             ->with('sets')
             ->get()
@@ -33,9 +36,16 @@ class DashboardController extends Controller
 
         $totalPRs = $user->records()->count();
 
-        $lastSession = $user->trainingSessions()->latest('date')->first();
+        $lastSession = $user->trainingSessions()
+            ->where('is_finished', true)
+            ->latest('date')
+            ->first();
 
-        $sessions = $user->trainingSessions()->latest('date')->take(10)->get();
+        $sessions = $user->trainingSessions()
+            ->where('is_finished', true)
+            ->latest('date')
+            ->take(10)
+            ->get();
 
         return view('dashboard', compact(
             'sessionsThisWeek',

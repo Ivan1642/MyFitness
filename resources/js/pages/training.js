@@ -1,16 +1,41 @@
 const CSRF = () => document.querySelector('meta[name="csrf-token"]').content;
+const STORAGE_KEY = 'myfitness_training';
 
 let sessionId = null;
+let sessionStart = null;
 let exercisesDB = [];
 let exerciseBlocks = [];
+
+function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        sessionId,
+        sessionStart,
+        exerciseBlocks
+    }));
+}
+
+function loadState() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    sessionId = state.sessionId;
+    sessionStart = state.sessionStart;
+    exerciseBlocks = state.exerciseBlocks;
+}
+
+function clearState() {
+    localStorage.removeItem(STORAGE_KEY);
+}
 
 window.addEventListener("DOMContentLoaded", async () => {
 
     const el = document.getElementById("training-app");
     if (!el) return;
 
+    loadState();
+
     try {
-        const res = await fetch("/api/exercises");
+        const res = await fetch(`${window.APP_URL}/api/exercises`);
         exercisesDB = await res.json();
     } catch (e) {
         exercisesDB = [];
@@ -56,7 +81,16 @@ window.addEventListener("DOMContentLoaded", async () => {
             <div class="bg-white rounded-2xl shadow overflow-hidden">
 
                 <div class="bg-[#003942] px-4 py-3 flex justify-between items-center">
-                    <h3 class="font-bold text-white text-base">${block.name}</h3>
+                    <div class="flex items-center gap-3">
+                        ${block.image
+                            ? `<img src="${block.image}" alt="${block.name}" class="h-10 w-10 rounded-lg object-cover bg-white/10">`
+                            : `<span class="material-symbols-outlined text-white/60">fitness_center</span>`
+                        }
+                        <div>
+                            <h3 class="font-bold text-white text-base">${block.name}</h3>
+                            <p class="text-white/50 text-xs">${block.muscle_group}</p>
+                        </div>
+                    </div>
                     <button data-remove-block="${bi}"
                         class="text-white/50 hover:text-white text-sm transition">
                         Eliminar
@@ -97,14 +131,21 @@ window.addEventListener("DOMContentLoaded", async () => {
                                 data-bi="${bi}" data-si="${si}" data-f="weight"
                                 ${set.saved ? 'readonly' : ''}>
 
-                            <button data-save-bi="${bi}" data-save-si="${si}"
-                                class="col-span-2 flex items-center justify-center h-12 rounded-xl font-bold transition active:scale-95
-                                ${set.saved ? 'bg-green-100 text-green-600' : 'bg-[#003942] text-white'}">
-                                ${set.saved
-                                    ? '<span class="material-symbols-outlined text-xl">check</span>'
-                                    : '<span class="material-symbols-outlined text-xl">arrow_forward</span>'
-                                }
-                            </button>
+                            <div class="col-span-2 flex flex-col gap-1">
+                                <button data-save-bi="${bi}" data-save-si="${si}"
+                                    title="${set.saved ? 'Desmarcar serie' : 'Marcar como completada'}"
+                                    class="flex items-center justify-center h-9 rounded-xl font-bold transition active:scale-95
+                                    ${set.saved ? 'bg-green-100 text-green-600' : 'bg-[#003942] text-white'}">
+                                    <span class="material-symbols-outlined text-xl">
+                                        ${set.saved ? 'check' : 'arrow_forward'}
+                                    </span>
+                                </button>
+                                <button data-remove-set-bi="${bi}" data-remove-set-si="${si}"
+                                    title="Eliminar serie"
+                                    class="flex items-center justify-center h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition active:scale-95">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </div>
 
                         </div>
                     `).join('')}
@@ -126,7 +167,12 @@ window.addEventListener("DOMContentLoaded", async () => {
                     class="w-full border-2 border-gray-200 rounded-xl p-4 text-[#003942] font-semibold focus:border-[#003942] focus:outline-none transition">
                     <option value="">Selecciona un ejercicio...</option>
                     ${exercisesDB.map(e => `
-                        <option value="${e.id}" data-name="${e.name}">${e.name}</option>
+                        <option value="${e.id}"
+                            data-name="${e.name}"
+                            data-image="${e.image ?? ''}"
+                            data-muscle-group="${e.muscle_group}">
+                            ${e.name}
+                        </option>
                     `).join('')}
                 </select>
                 <button id="addExercise"
@@ -140,10 +186,56 @@ window.addEventListener("DOMContentLoaded", async () => {
     function renderFinishButton() {
         return `
             <button id="finishSession"
-                class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition shadow-lg">
+                class="w-full bg-white border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white py-4 rounded-xl font-bold text-lg active:scale-95 transition shadow">
                 Finalizar entrenamiento
             </button>
         `;
+    }
+
+    function renderModal() {
+        const modal = document.createElement('div');
+        modal.id = 'finish-modal';
+        modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4';
+        modal.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+                <h2 class="text-xl font-bold text-[#003942]">Finalizar entrenamiento</h2>
+                <p class="text-gray-500 text-sm">¿Quieres añadir alguna nota sobre el entrenamiento?</p>
+                <textarea id="session-notes"
+                    placeholder="Ej: Me sentí con mucha energía, aumenté el peso en press banca..."
+                    class="w-full border-2 border-gray-200 focus:border-[#003942] rounded-xl p-3 text-sm focus:outline-none transition resize-none h-28"></textarea>
+                <div class="flex gap-3">
+                    <button id="modal-cancel"
+                        class="flex-1 border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-semibold hover:bg-gray-50 transition">
+                        Cancelar
+                    </button>
+                    <button id="modal-confirm"
+                        class="flex-1 bg-[#003942] text-white py-3 rounded-xl font-semibold hover:bg-[#002a31] transition">
+                        Guardar y salir
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('modal-cancel').onclick = () => modal.remove();
+
+        document.getElementById('modal-confirm').onclick = async () => {
+            const notes = document.getElementById('session-notes').value;
+            const duration = sessionStart ? Math.round((Date.now() - sessionStart) / 60000) : null;
+
+            try {
+                const res = await fetch(`${window.APP_URL}/training/session/${sessionId}/finish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+                    body: JSON.stringify({ notes, duration })
+                });
+                if (!res.ok) throw new Error();
+                clearState();
+                window.location.href = `${window.APP_URL}/dashboard`;
+            } catch (e) {
+                alert('Error al finalizar el entrenamiento. Inténtalo de nuevo.');
+            }
+        };
     }
 
     function bindEvents() {
@@ -154,13 +246,15 @@ window.addEventListener("DOMContentLoaded", async () => {
                 startBtn.disabled = true;
                 startBtn.textContent = 'Iniciando...';
                 try {
-                    const res = await fetch('/training/session', {
+                    const res = await fetch(`${window.APP_URL}/training/session`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() }
                     });
                     if (!res.ok) throw new Error();
                     const data = await res.json();
                     sessionId = data.session_id;
+                    sessionStart = Date.now();
+                    saveState();
                     render();
                 } catch (e) {
                     alert('No se pudo iniciar el entrenamiento. Inténtalo de nuevo.');
@@ -174,11 +268,18 @@ window.addEventListener("DOMContentLoaded", async () => {
         if (addExBtn) {
             addExBtn.onclick = () => {
                 const select = document.getElementById('exerciseSelect');
+                const option = select.options[select.selectedIndex];
                 const id = select.value;
-                const name = select.options[select.selectedIndex]?.dataset.name;
                 if (!id) { alert('Selecciona un ejercicio primero'); return; }
-                exerciseBlocks.push({ exercise_id: id, name, sets: [{ reps: '', weight: '', saved: false }] });
+                exerciseBlocks.push({
+                    exercise_id:  id,
+                    name:         option.dataset.name,
+                    image:        option.dataset.image,
+                    muscle_group: option.dataset.muscleGroup,
+                    sets:         [{ reps: '', weight: '', saved: false }]
+                });
                 select.value = '';
+                saveState();
                 render();
             };
         }
@@ -187,6 +288,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             btn.onclick = (e) => {
                 const bi = e.currentTarget.dataset.addSet;
                 exerciseBlocks[bi].sets.push({ reps: '', weight: '', saved: false });
+                saveState();
                 render();
             };
         });
@@ -196,8 +298,19 @@ window.addEventListener("DOMContentLoaded", async () => {
                 const bi = e.currentTarget.dataset.removeBlock;
                 if (confirm('¿Eliminar este ejercicio y todas sus series?')) {
                     exerciseBlocks.splice(bi, 1);
+                    saveState();
                     render();
                 }
+            };
+        });
+
+        document.querySelectorAll('[data-remove-set-bi]').forEach(btn => {
+            btn.onclick = (e) => {
+                const bi = e.currentTarget.dataset.removeSetBi;
+                const si = e.currentTarget.dataset.removeSetSi;
+                exerciseBlocks[bi].sets.splice(si, 1);
+                saveState();
+                render();
             };
         });
 
@@ -205,6 +318,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             input.oninput = (e) => {
                 const { bi, si, f } = e.target.dataset;
                 exerciseBlocks[bi].sets[si][f] = e.target.value;
+                saveState();
             };
         });
 
@@ -214,14 +328,20 @@ window.addEventListener("DOMContentLoaded", async () => {
                 const si = e.currentTarget.dataset.saveSi;
                 const set = exerciseBlocks[bi].sets[si];
 
-                if (set.saved) return;
+                if (set.saved) {
+                    exerciseBlocks[bi].sets[si].saved = false;
+                    saveState();
+                    render();
+                    return;
+                }
+
                 if (!set.reps || !set.weight) {
                     alert('Rellena repeticiones y peso antes de guardar');
                     return;
                 }
 
                 try {
-                    const res = await fetch('/training/set', {
+                    const res = await fetch(`${window.APP_URL}/training/set`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
                         body: JSON.stringify({
@@ -233,6 +353,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                     });
                     if (!res.ok) throw new Error();
                     exerciseBlocks[bi].sets[si].saved = true;
+                    saveState();
                     render();
                 } catch (e) {
                     alert('Error al guardar la serie. Inténtalo de nuevo.');
@@ -243,7 +364,18 @@ window.addEventListener("DOMContentLoaded", async () => {
         const finishBtn = document.getElementById('finishSession');
         if (finishBtn) {
             finishBtn.onclick = () => {
-                alert('Funcionalidad de finalizar próximamente');
+                const unsaved = exerciseBlocks.some(block =>
+                    block.sets.some(set => !set.saved)
+                );
+                if (unsaved) {
+                    alert('Tienes series sin guardar. Márcalas todas antes de finalizar.');
+                    return;
+                }
+                if (exerciseBlocks.length === 0) {
+                    alert('No has añadido ningún ejercicio.');
+                    return;
+                }
+                renderModal();
             };
         }
     }

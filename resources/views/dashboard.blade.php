@@ -57,8 +57,9 @@
         @if($sessions->count())
             <div class="space-y-3">
                 @foreach($sessions as $session)
-                    <div class="border-b pb-2 flex justify-between items-center">
-                        <div>
+                    <div class="border-b pb-3 flex justify-between items-center gap-2">
+
+                        <div class="flex-1">
                             <p class="font-semibold">
                                 {{ $session->date->format('d/m/Y H:i') }}
                             </p>
@@ -66,7 +67,30 @@
                                 <p class="text-gray-500 text-sm">{{ $session->notes }}</p>
                             @endif
                         </div>
-                        <a href="#" class="text-sm text-[#003942] hover:underline">Ver →</a>
+
+                        <div class="flex items-center gap-2">
+
+                            <select
+                                data-session-id="{{ $session->id }}"
+                                class="visibility-select text-sm border rounded px-2 py-1 text-[#003942] focus:outline-none focus:ring-1 focus:ring-[#003942]">
+                                <option value="1" {{ $session->is_public ? 'selected' : '' }}>Pública</option>
+                                <option value="0" {{ !$session->is_public ? 'selected' : '' }}>Privada</option>
+                            </select>
+
+                            <a href="#" class="text-sm text-[#003942] hover:underline">Ver</a>
+
+                            <form method="POST" action="{{ route('training.destroy', $session->id) }}"
+                                onsubmit="return confirm('¿Eliminar este entrenamiento? Esta acción no se puede deshacer.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="text-sm text-red-400 hover:text-red-600 transition">
+                                    Eliminar
+                                </button>
+                            </form>
+
+                        </div>
+
                     </div>
                 @endforeach
             </div>
@@ -78,3 +102,21 @@
 
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        window.APP_URL = "{{ url('/') }}";
+        document.querySelectorAll('.visibility-select').forEach(select => {
+            select.addEventListener('change', async (e) => {
+                const id = e.target.dataset.sessionId;
+                await fetch(`${window.APP_URL}/training/session/${id}/visibility`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

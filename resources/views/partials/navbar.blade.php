@@ -51,7 +51,7 @@
                          x-transition
                          class="absolute right-0 mt-2 w-48 bg-white text-[#003942] rounded shadow-lg z-50">
 
-                            <a href="/" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            <a href="/dashboard" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                 Inicio
                             </a>
                             <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
@@ -71,7 +71,7 @@
                         <form method="POST" action="{{ url('/logout') }}">
                             @csrf
                             <button class="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                Logout
+                                Cerrar Sesión
                             </button>
                         </form>
 

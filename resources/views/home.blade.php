@@ -26,7 +26,7 @@
         </div>
 
         <a class="mitad-w">
-            <img src="{{ asset('img/logoMyFitness2.png') }}" alt="MyFitness">
+            <img src="{{ asset('img/img_portada.png') }}" alt="MyFitness">
         </a>
 </div>
 

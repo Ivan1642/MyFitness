@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@push('scripts')
-    @vite('resources/js/pages/training.js')
-@endpush
-
 @section('content')
 <div class="max-w-lg mx-auto">
 
@@ -16,3 +12,10 @@
 
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        window.APP_URL = "{{ url('/') }}";
+    </script>
+    @vite('resources/js/pages/training.js')
+@endpush

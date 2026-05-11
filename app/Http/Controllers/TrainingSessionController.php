@@ -17,11 +17,13 @@ class TrainingSessionController extends Controller
     public function store(Request $request)
     {
         $session = TrainingSession::create([
-            'user_id'    => auth()->id(),
-            'date'       => now(),
-            'routine_id' => null,
-            'duration'   => null,
-            'notes'      => null,
+            'user_id'     => auth()->id(),
+            'date'        => now(),
+            'routine_id'  => null,
+            'duration'    => null,
+            'notes'       => null,
+            'is_finished' => false,
+            'is_public'   => true,
         ]);
 
         return response()->json(['session_id' => $session->id]);
@@ -44,5 +46,47 @@ class TrainingSessionController extends Controller
         ]);
 
         return response()->json(['ok' => true, 'set_id' => $set->id]);
+    }
+
+    public function finish(Request $request, $id)
+    {
+        $session = TrainingSession::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $request->validate([
+            'notes'    => 'nullable|string|max:500',
+            'duration' => 'nullable|integer|min:1',
+        ]);
+
+        $session->update([
+            'notes'       => $request->notes,
+            'duration'    => $request->duration,
+            'is_finished' => true,
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function destroy($id)
+    {
+        $session = TrainingSession::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $session->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Sesión eliminada correctamente.');
+    }
+
+    public function toggleVisibility(Request $request, $id)
+    {
+        $session = TrainingSession::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $session->update(['is_public' => !$session->is_public]);
+
+        return response()->json(['is_public' => $session->is_public]);
     }
 }

@@ -18,6 +18,8 @@ class TrainingSession extends Model
         'duration',
         'notes',
         'photo',
+        'is_finished',
+        'is_public',
     ];
 
     protected $casts = [
