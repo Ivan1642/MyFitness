@@ -16,6 +16,11 @@ class TrainingSessionController extends Controller
 
     public function store(Request $request)
     {
+        TrainingSession::where('user_id', auth()->id())
+            ->where('is_finished', false)
+            ->whereDoesntHave('sets')
+            ->delete();
+
         $session = TrainingSession::create([
             'user_id'     => auth()->id(),
             'date'        => now(),
@@ -54,23 +59,27 @@ class TrainingSessionController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
+        \Log::info('Sesión encontrada', ['is_finished_antes' => $session->is_finished]);
+
         $request->validate([
             'notes'    => 'nullable|string|max:500',
-            'duration' => 'nullable|integer|min:1',
+            'duration' => 'nullable|integer|min:0',
             'photo'    => 'nullable|image|max:4096',
         ]);
 
         $data = [
             'notes'       => $request->notes,
             'duration'    => $request->duration ?: null,
-            'is_finished' => true,
+            'is_finished' => 1,
         ];
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('training_photos', 'public');
         }
 
-        $session->update($data);
+        $result = $session->update($data);
+
+        \Log::info('Update ejecutado', ['result' => $result, 'is_finished_despues' => $session->fresh()->is_finished]);
 
         return response()->json(['ok' => true]);
     }
@@ -95,5 +104,14 @@ class TrainingSessionController extends Controller
         $session->update(['is_public' => !$session->is_public]);
 
         return response()->json(['is_public' => $session->is_public]);
+    }
+
+    public function cancel($id)
+    {
+        TrainingSession::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->delete();
+
+        return response()->json(['ok' => true]);
     }
 }

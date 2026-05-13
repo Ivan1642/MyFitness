@@ -32,7 +32,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     const el = document.getElementById("training-app");
     if (!el) return;
 
-    loadState();
+    if (window.PRELOADED_SESSION_ID && window.PRELOADED_ROUTINE) {
+        clearState();
+        sessionId = window.PRELOADED_SESSION_ID;
+        sessionStart = Date.now();
+        exerciseBlocks = window.PRELOADED_ROUTINE;
+        saveState();
+    } else {
+        loadState();
+    }
 
     try {
         const res = await fetch(`${window.APP_URL}/api/exercises`);
@@ -227,11 +235,11 @@ window.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('modal-confirm').onclick = async () => {
             const notes = document.getElementById('session-notes').value;
             const photo = document.getElementById('session-photo').files[0];
-            const duration = sessionStart ? Math.round((Date.now() - sessionStart) / 60000) : null;
+            const duration = sessionStart ? Math.round((Date.now() - Number(sessionStart)) / 60000) : null;
 
             const formData = new FormData();
             formData.append('notes', notes);
-            formData.append('duration', duration ?? '');
+            formData.append('duration', duration !== null ? duration : '');
             if (photo) formData.append('photo', photo);
 
             try {

@@ -77,7 +77,7 @@
                                 <option value="0" {{ !$session->is_public ? 'selected' : '' }}>Privada</option>
                             </select>
 
-                            <a href="#" class="text-sm text-[#003942] hover:underline">Ver</a>
+                            <a href="{{ route('training.show', $session->id) }}" class="text-sm text-[#003942] hover:underline">Ver -></a>
 
                             <form method="POST" action="{{ route('training.destroy', $session->id) }}"
                                 onsubmit="return confirm('¿Eliminar este entrenamiento? Esta acción no se puede deshacer.')">

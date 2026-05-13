@@ -8,6 +8,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <title>@yield('title', 'MyFitness')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>window.APP_URL = "{{ url('/') }}";</script>
 </head>
 <body class="bg-white text-[#003942] min-h-screen flex flex-col">
 

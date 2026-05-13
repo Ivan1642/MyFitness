@@ -23,7 +23,9 @@ class TrainingSession extends Model
     ];
 
     protected $casts = [
-        'date' => 'datetime',
+        'date'        => 'datetime',
+        'is_finished' => 'boolean',
+        'is_public'   => 'boolean',
     ];
 
     public function user()

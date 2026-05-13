@@ -38,4 +38,9 @@ class Routine extends Model
     {
         return $this->hasMany(RoutineLike::class, 'routine_id');
     }
+
+    public function routineSets()
+    {
+        return $this->hasMany(RoutineSet::class)->orderBy('exercise_id')->orderBy('set_order');
+    }
 }

@@ -3,65 +3,170 @@
 namespace App\Http\Controllers;
 
 use App\Models\Routine;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRoutineRequest;
-use App\Http\Requests\UpdateRoutineRequest;
+use App\Models\RoutineSet;
+use App\Models\TrainingSession;
+use App\Models\Set;
+use Illuminate\Http\Request;
 
 class RoutineController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $routines = auth()->user()->routines()->with(['routineSets.exercise'])->get();
+        return view('routines.index', compact('routines'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        if (auth()->user()->routines()->count() >= 4) {
+            return redirect()->route('routines.index')->with('error', 'Has alcanzado el límite de 4 rutinas.');
+        }
+
+        $exercises = \App\Models\Exercise::select('id', 'name', 'muscle_group')->orderBy('name')->get();
+        return view('routines.create', compact('exercises'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRoutineRequest $request)
+    public function store(Request $request)
     {
-        //
+        if (auth()->user()->routines()->count() >= 4) {
+            return redirect()->route('routines.index')->with('error', 'Has alcanzado el límite de 4 rutinas.');
+        }
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'exercises'   => 'required|array|min:1',
+        ]);
+
+        $routine = Routine::create([
+            'user_id'     => auth()->id(),
+            'name'        => $request->name,
+            'description' => $request->description,
+        ]);
+
+        foreach ($request->exercises as $order => $ex) {
+            if (empty($ex['exercise_id'])) continue;
+            if (empty($ex['sets'])) continue;
+            foreach ($ex['sets'] as $setOrder => $set) {
+                if (empty($set['repetitions']) || !isset($set['weight'])) continue;
+                RoutineSet::create([
+                    'routine_id'  => $routine->id,
+                    'exercise_id' => $ex['exercise_id'],
+                    'set_order'   => $setOrder + 1,
+                    'repetitions' => $set['repetitions'],
+                    'weight'      => $set['weight'],
+                ]);
+            }
+        }
+
+        return redirect()->route('routines.index')->with('success', 'Rutina creada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Routine $routine)
+    public function edit($id)
     {
-        //
+        $routine = Routine::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->with(['routineSets.exercise'])
+            ->firstOrFail();
+
+        $exercises = \App\Models\Exercise::select('id', 'name', 'muscle_group')->orderBy('name')->get();
+
+        $routineData = $routine->routineSets->groupBy('exercise_id')->map(function($sets) {
+            return [
+                'id'     => (string) $sets->first()->exercise_id,
+                'name'   => $sets->first()->exercise->name,
+                'muscle' => $sets->first()->exercise->muscle_group,
+                'sets'   => $sets->map(fn($s) => ['reps' => $s->repetitions, 'weight' => $s->weight])->values()
+            ];
+        })->values();
+
+        return view('routines.edit', compact('routine', 'exercises', 'routineData'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Routine $routine)
+    public function update(Request $request, $id)
     {
-        //
+        $routine = Routine::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'exercises'   => 'required|array|min:1',
+        ]);
+
+        $routine->update([
+            'name'        => $request->name,
+            'description' => $request->description,
+        ]);
+
+        $routine->routineSets()->delete();
+
+        foreach ($request->exercises as $order => $ex) {
+            if (empty($ex['exercise_id'])) continue;
+            if (empty($ex['sets'])) continue;
+            foreach ($ex['sets'] as $setOrder => $set) {
+                if (empty($set['repetitions']) || !isset($set['weight'])) continue;
+                RoutineSet::create([
+                    'routine_id'  => $routine->id,
+                    'exercise_id' => $ex['exercise_id'],
+                    'set_order'   => $setOrder + 1,
+                    'repetitions' => $set['repetitions'],
+                    'weight'      => $set['weight'],
+                ]);
+            }
+        }
+
+        return redirect()->route('routines.index')->with('success', 'Rutina actualizada correctamente.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateRoutineRequest $request, Routine $routine)
+    public function destroy($id)
     {
-        //
+        $routine = Routine::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $routine->delete();
+
+        return redirect()->route('routines.index')->with('success', 'Rutina eliminada correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Routine $routine)
+    public function start($id)
     {
-        //
+        $routine = Routine::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->with(['routineSets.exercise'])
+            ->firstOrFail();
+
+        TrainingSession::where('user_id', auth()->id())
+            ->where('is_finished', false)
+            ->whereDoesntHave('sets')
+            ->delete();
+
+        $session = TrainingSession::create([
+            'user_id'     => auth()->id(),
+            'routine_id'  => $routine->id,
+            'date'        => now(),
+            'is_finished' => false,
+            'is_public'   => true,
+        ]);
+
+        $routineData = $routine->routineSets->groupBy('exercise_id')->map(function($sets) {
+            return [
+                'exercise_id'  => (string) $sets->first()->exercise_id,
+                'name'         => $sets->first()->exercise->name,
+                'image'        => $sets->first()->exercise->image,
+                'muscle_group' => $sets->first()->exercise->muscle_group,
+                'sets'         => $sets->map(fn($s) => [
+                    'reps'   => $s->repetitions,
+                    'weight' => $s->weight,
+                    'saved'  => false
+                ])->values()
+            ];
+        })->values();
+
+        return redirect()->route('training.start')
+            ->with('session_id', $session->id)
+            ->with('routine_data', $routineData->toJson());
     }
 }

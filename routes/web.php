@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrainingSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoutineController;
 
 //landing sin loguear
 Route::get('/', function () {
@@ -32,10 +33,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/training/set', [TrainingSessionController::class, 'storeSet'])->name('training.set');
     Route::post('/training/session/{id}/finish', [TrainingSessionController::class, 'finish'])->name('training.finish');
     Route::delete('/training/session/{id}', [TrainingSessionController::class, 'destroy'])->name('training.destroy');
+    Route::delete('/training/session/{id}/cancel', [TrainingSessionController::class, 'cancel'])->name('training.cancel');
     Route::patch('/training/session/{id}/visibility', [TrainingSessionController::class, 'toggleVisibility'])->name('training.visibility');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/training/session/{id}', [TrainingSessionController::class, 'show'])->name('training.show');
+    Route::get('/rutinas', [RoutineController::class, 'index'])->name('routines.index');
+    Route::get('/rutinas/crear', [RoutineController::class, 'create'])->name('routines.create');
+    Route::post('/rutinas', [RoutineController::class, 'store'])->name('routines.store');
+    Route::get('/rutinas/{id}/editar', [RoutineController::class, 'edit'])->name('routines.edit');
+    Route::put('/rutinas/{id}', [RoutineController::class, 'update'])->name('routines.update');
+    Route::delete('/rutinas/{id}', [RoutineController::class, 'destroy'])->name('routines.destroy');
+    Route::post('/rutinas/{id}/start', [RoutineController::class, 'start'])->name('routines.start');
 });
 
 //API ejercicios

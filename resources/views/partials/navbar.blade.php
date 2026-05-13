@@ -10,7 +10,7 @@
         @auth
             <nav class="hidden md:flex space-x-6">
                 <a href="{{ route('dashboard') }}" class="hover:text-black hover:underline">Inicio</a>
-                <a href="/rutinas" class="hover:text-black hover:underline">Rutinas</a>
+                <a href="{{ route('routines.index') }}" class="hover:text-black hover:underline">Rutinas</a>
                 <a href="/progreso" class="hover:text-black hover:underline">Progreso</a>
                 <a href="/feed" class="hover:text-black hover:underline">Feed</a>
             </nav>
@@ -54,7 +54,7 @@
                         <a href="{{ route('dashboard') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Inicio
                         </a>
-                        <a href="/rutinas" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <a href="{{ route('routines.index') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Rutinas
                         </a>
                         <a href="/progreso" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">

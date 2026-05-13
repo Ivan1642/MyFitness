@@ -16,6 +16,12 @@
 @push('scripts')
     <script>
         window.APP_URL = "{{ url('/') }}";
+        @if(session('session_id'))
+            window.PRELOADED_SESSION_ID = {{ session('session_id') }};
+        @endif
+        @if(session('routine_data'))
+            window.PRELOADED_ROUTINE = {!! session('routine_data') !!};
+        @endif
     </script>
     @vite('resources/js/pages/training.js')
 @endpush
