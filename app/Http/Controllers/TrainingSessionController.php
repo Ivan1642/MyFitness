@@ -9,6 +9,24 @@ use Illuminate\Http\Request;
 
 class TrainingSessionController extends Controller
 {
+
+    public function show($id)
+    {
+        $session = TrainingSession::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->with(['sets.exercise'])
+            ->firstOrFail();
+
+        $totalVolume = 0;
+        foreach ($session->sets as $set) {
+            $totalVolume += $set->weight * $set->repetitions;
+        }
+        $totalSets = $session->sets->count();
+        $totalReps = $session->sets->sum('repetitions');
+        $exerciseGroups = $session->sets->groupBy('exercise_id');
+
+        return view('training.show', compact('session', 'totalVolume', 'totalSets', 'totalReps', 'exerciseGroups'));
+    }
     public function start()
     {
         return view('training.start');
@@ -49,6 +67,20 @@ class TrainingSessionController extends Controller
             'repetitions'         => $request->repetitions,
             'weight'              => $request->weight,
         ]);
+
+        $record = \App\Models\Record::where('user_id', auth()->id())
+            ->where('exercise_id', $request->exercise_id)
+            ->first();
+
+        if (!$record) {
+            \App\Models\Record::create([
+                'user_id'     => auth()->id(),
+                'exercise_id' => $request->exercise_id,
+                'max_weight'  => $request->weight,
+            ]);
+        } elseif ($request->weight > $record->max_weight) {
+            $record->update(['max_weight' => $request->weight]);
+        }
 
         return response()->json(['ok' => true, 'set_id' => $set->id]);
     }

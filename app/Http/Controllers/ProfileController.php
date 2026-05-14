@@ -27,7 +27,7 @@ class ProfileController extends Controller
             'bio'      => 'nullable|string|max:500',
             'weight'   => 'nullable|numeric|min:0|max:300',
             'height'   => 'nullable|integer|min:0|max:300',
-            'avatar'   => 'nullable|image|max:2048',
+            'avatar' => 'nullable|image|max:5120',
         ]);
 
         $data = [
