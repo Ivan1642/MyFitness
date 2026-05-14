@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            <!-- Formulario edición -->
+            <!-- Formulario edicion -->
             <form id="editMode" method="POST" action="{{ route('profile.update') }}"
                 enctype="multipart/form-data" class="hidden space-y-4 mt-2">
                 @csrf
@@ -188,6 +188,24 @@
         </div>
     </div>
 </div>
+
+<!-- Logros -->
+@if($achievements->count())
+    <div class="bg-white rounded-2xl shadow p-6 mt-4">
+        <h2 class="text-lg font-bold text-[#003942] mb-4">Logros conseguidos</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            @foreach($achievements as $achievement)
+                <div class="bg-[#003942]/5 border border-[#003942]/20 rounded-xl p-3 text-center">
+                    <span class="material-symbols-outlined text-[#003942] text-3xl mb-1 block">
+                        emoji_events
+                    </span>
+                    <p class="text-sm font-semibold text-[#003942]">{{ $achievement->name }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ $achievement->created_at->format('d/m/Y') }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
 
 @endsection
 

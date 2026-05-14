@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrainingSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoutineController;
+use App\Http\Controllers\ProgressController;
 
 //landing sin loguear
 Route::get('/', function () {
@@ -45,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/rutinas/{id}', [RoutineController::class, 'update'])->name('routines.update');
     Route::delete('/rutinas/{id}', [RoutineController::class, 'destroy'])->name('routines.destroy');
     Route::post('/rutinas/{id}/start', [RoutineController::class, 'start'])->name('routines.start');
+    Route::get('/progreso', [ProgressController::class, 'index'])->name('progress.index');
 });
 
 //API ejercicios

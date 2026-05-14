@@ -10,11 +10,11 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
-
         $followers = $user->followers()->with('follower')->get();
         $following = $user->following()->with('following')->get();
+        $achievements = $user->achievements()->orderByDesc('created_at')->get();
 
-        return view('profile.index', compact('user', 'followers', 'following'));
+        return view('profile.index', compact('user', 'followers', 'following', 'achievements'));
     }
 
     public function update(Request $request)

@@ -10,18 +10,12 @@ class Achievement extends Model
 
     protected $fillable = [
         'user_id',
-        'type',
-        'exercise_id',
-        'value',
+        'slug',
+        'name',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function exercise()
-    {
-        return $this->belongsTo(Exercise::class, 'exercise_id');
     }
 }

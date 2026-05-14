@@ -82,6 +82,8 @@ class TrainingSessionController extends Controller
             $record->update(['max_weight' => $request->weight]);
         }
 
+        (new \App\Services\AchievementService())->check(auth()->user());
+
         return response()->json(['ok' => true, 'set_id' => $set->id]);
     }
 
@@ -101,7 +103,7 @@ class TrainingSessionController extends Controller
 
         $data = [
             'notes'       => $request->notes,
-            'duration'    => $request->duration ?: null,
+            'duration'    => $request->duration !== '' ? (int) $request->duration : 0,
             'is_finished' => 1,
         ];
 
@@ -112,6 +114,8 @@ class TrainingSessionController extends Controller
         $result = $session->update($data);
 
         \Log::info('Update ejecutado', ['result' => $result, 'is_finished_despues' => $session->fresh()->is_finished]);
+
+        (new \App\Services\AchievementService())->check(auth()->user());
 
         return response()->json(['ok' => true]);
     }
