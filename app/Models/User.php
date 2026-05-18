@@ -9,18 +9,27 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $table = 'users';
-
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'avatar',
         'weight',
         'height',
         'bio',
-        'username',
+        'is_admin',
+        'banned_at',
     ];
+
+    protected $casts = [
+        'banned_at' => 'datetime',
+    ];
+
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null && $this->banned_at->diffInDays(now()) < 2;
+    }
 
     public function trainingSessions()
     {

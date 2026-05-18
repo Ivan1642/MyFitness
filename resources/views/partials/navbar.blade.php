@@ -12,7 +12,10 @@
                 <a href="{{ route('dashboard') }}" class="hover:text-black hover:underline">Inicio</a>
                 <a href="{{ route('routines.index') }}" class="hover:text-black hover:underline">Rutinas</a>
                 <a href="{{ route('progress.index') }}" class="hover:text-black hover:underline">Progreso</a>
-                <a href="/feed" class="hover:text-black hover:underline">Feed</a>
+                <a href="" class="hover:text-black hover:underline">Feed</a>
+                @if(auth()->user()->is_admin)
+                    <a href="{{ route('admin.index') }}" class="hover:text-black hover:underline">Panel de Admin</a>
+                @endif
             </nav>
         @endauth
 
@@ -67,6 +70,12 @@
                         <a href="{{ route('profile') }}" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Perfil
                         </a>
+
+                        @if(auth()->user()->is_admin)
+                            <a href="{{ route('admin.index') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                Panel de Admin
+                            </a>
+                        @endif
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

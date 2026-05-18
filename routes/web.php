@@ -7,6 +7,7 @@ use App\Http\Controllers\TrainingSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\AdminController;
 
 //landing sin loguear
 Route::get('/', function () {
@@ -55,3 +56,11 @@ Route::get('/api/exercises', function () {
         \App\Models\Exercise::select('id', 'name', 'muscle_group', 'image')->orderBy('name')->get()
     );
 })->middleware('auth');
+
+//Admin
+Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::post('/users/{id}/ban', [AdminController::class, 'ban'])->name('admin.ban');
+    Route::post('/users/{id}/unban', [AdminController::class, 'unban'])->name('admin.unban');
+    Route::delete('/users/{id}', [AdminController::class, 'destroy'])->name('admin.destroy');
+});
