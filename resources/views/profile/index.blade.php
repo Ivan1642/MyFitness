@@ -27,6 +27,11 @@
                     Editar perfil
                 </button>
 
+                <a href="{{ route('profile.feed', $user->id) }}"
+                    class="px-4 py-2 rounded-xl text-sm font-semibold border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white transition">
+                    Ver publicaciones
+                </a>
+
             </div>
 
             <!-- Perfil modo vista -->
@@ -141,6 +146,24 @@
         </div>
     </div>
 
+    <!-- Logros -->
+    @if($achievements->count())
+        <div class="bg-white rounded-2xl shadow p-6">
+            <h2 class="text-lg font-bold text-[#003942] mb-4">Logros conseguidos</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                @foreach($achievements as $achievement)
+                    <div class="bg-[#003942]/5 border border-[#003942]/20 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-[#003942] text-3xl mb-1 block">
+                            emoji_events
+                        </span>
+                        <p class="text-sm font-semibold text-[#003942]">{{ $achievement->name }}</p>
+                        <p class="text-xs text-gray-400 mt-1">{{ $achievement->created_at->format('d/m/Y') }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
 </div>
 
 <!-- seguidores -->
@@ -188,24 +211,6 @@
         </div>
     </div>
 </div>
-
-<!-- Logros -->
-@if($achievements->count())
-    <div class="bg-white rounded-2xl shadow p-6 mt-4">
-        <h2 class="text-lg font-bold text-[#003942] mb-4">Logros conseguidos</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            @foreach($achievements as $achievement)
-                <div class="bg-[#003942]/5 border border-[#003942]/20 rounded-xl p-3 text-center">
-                    <span class="material-symbols-outlined text-[#003942] text-3xl mb-1 block">
-                        emoji_events
-                    </span>
-                    <p class="text-sm font-semibold text-[#003942]">{{ $achievement->name }}</p>
-                    <p class="text-xs text-gray-400 mt-1">{{ $achievement->created_at->format('d/m/Y') }}</p>
-                </div>
-            @endforeach
-        </div>
-    </div>
-@endif
 
 @endsection
 

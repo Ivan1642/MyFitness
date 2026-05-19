@@ -12,7 +12,7 @@
                 <a href="{{ route('dashboard') }}" class="hover:text-black hover:underline">Inicio</a>
                 <a href="{{ route('routines.index') }}" class="hover:text-black hover:underline">Rutinas</a>
                 <a href="{{ route('progress.index') }}" class="hover:text-black hover:underline">Progreso</a>
-                <a href="" class="hover:text-black hover:underline">Feed</a>
+                <a href="{{ route('feed') }}" class="hover:text-black hover:underline">Feed</a>
                 @if(auth()->user()->is_admin)
                     <a href="{{ route('admin.index') }}" class="hover:text-black hover:underline">Panel de Admin</a>
                 @endif
@@ -63,7 +63,7 @@
                         <a href="{{ route('progress.index') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Progreso
                         </a>
-                        <a href="/feed" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <a href="{{ route('feed') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Feed
                         </a>
 

@@ -9,6 +9,15 @@
     width: 50%;
 }
 
+.active-tab {
+    background-color: #003942;
+    color: white;
+}
+
+.feed-tab:not(.active-tab) {
+    color: #003942;
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

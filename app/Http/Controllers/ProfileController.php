@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -48,5 +49,47 @@ class ProfileController extends Controller
         $user->update($data);
 
         return redirect()->route('profile')->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        $followers = $user->followers()->with('follower')->get();
+        $following = $user->following()->with('following')->get();
+        $achievements = $user->achievements()->orderByDesc('created_at')->get();
+
+        $isFollowing = auth()->user()->following()
+            ->where('following_id', $id)
+            ->exists();
+
+        return view('profile.show', compact('user', 'followers', 'following', 'achievements', 'isFollowing'));
+    }
+
+    public function follow($id)
+    {
+        $user = auth()->user();
+
+        $existing = $user->following()->where('following_id', $id)->first();
+
+        if ($existing) {
+            \App\Models\Follower::where('follower_id', $user->id)
+                ->where('following_id', $id)
+                ->delete();
+        } else {
+            \App\Models\Follower::create([
+                'follower_id'  => $user->id,
+                'following_id' => $id,
+            ]);
+
+            (new \App\Services\AchievementService())->check($user);
+        }
+
+        return redirect()->route('profile.show', $id);
+    }
+
+    public function feed($id)
+    {
+        $user = User::findOrFail($id);
+        return view('profile.feed', compact('user'));
     }
 }

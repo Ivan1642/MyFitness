@@ -8,13 +8,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FeedController;
 
 //landing sin loguear
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
-// Landing logueado
+//Landing logueado
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
@@ -28,7 +29,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-//Entrenamiento
+//Una vez logueado
 Route::middleware('auth')->group(function () {
     Route::get('/training/start', [TrainingSessionController::class, 'start'])->name('training.start');
     Route::post('/training/session', [TrainingSessionController::class, 'store'])->name('training.session');
@@ -48,6 +49,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/rutinas/{id}', [RoutineController::class, 'destroy'])->name('routines.destroy');
     Route::post('/rutinas/{id}/start', [RoutineController::class, 'start'])->name('routines.start');
     Route::get('/progreso', [ProgressController::class, 'index'])->name('progress.index');
+    Route::get('/feed', [FeedController::class, 'index'])->name('feed');
+    Route::get('/feed/load', [FeedController::class, 'load'])->name('feed.load');
+    Route::post('/feed/like', [FeedController::class, 'like'])->name('feed.like');
+    Route::get('/feed/search', [FeedController::class, 'search'])->name('feed.search');
+    Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profile/{id}/follow', [ProfileController::class, 'follow'])->name('profile.follow');
+    Route::get('/profile/{id}/feed', [ProfileController::class, 'feed'])->name('profile.feed');
+    Route::get('/profile/{id}/feed/load', [FeedController::class, 'loadProfile'])->name('profile.feed.load');
 });
 
 //API ejercicios
