@@ -34,6 +34,7 @@
         window.APP_URL = "{{ url('/') }}";
         window.CSRF = "{{ csrf_token() }}";
         window.PROFILE_ID = {{ $user->id }};
+        window.AUTH_USER_ID = {{ auth()->id() }};
     </script>
     @vite('resources/js/pages/profile-feed.js')
 @endpush

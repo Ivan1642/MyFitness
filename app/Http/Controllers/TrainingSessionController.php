@@ -13,7 +13,10 @@ class TrainingSessionController extends Controller
     public function show($id)
     {
         $session = TrainingSession::where('id', $id)
-            ->where('user_id', auth()->id())
+            ->where(function($q) {
+                $q->where('user_id', auth()->id())
+                ->orWhere('is_public', true);
+            })
             ->with(['sets.exercise'])
             ->firstOrFail();
 
@@ -21,12 +24,14 @@ class TrainingSessionController extends Controller
         foreach ($session->sets as $set) {
             $totalVolume += $set->weight * $set->repetitions;
         }
+
         $totalSets = $session->sets->count();
         $totalReps = $session->sets->sum('repetitions');
         $exerciseGroups = $session->sets->groupBy('exercise_id');
 
         return view('training.show', compact('session', 'totalVolume', 'totalSets', 'totalReps', 'exerciseGroups'));
     }
+    
     public function start()
     {
         return view('training.start');

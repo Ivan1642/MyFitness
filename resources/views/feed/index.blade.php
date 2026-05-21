@@ -17,6 +17,12 @@
                 class="h-6 w-6 rounded-full object-cover">
             Mi perfil
         </a>
+        <!-- Crear posts -->
+        <a href="{{ route('posts.create') }}"
+            class="flex-1 flex items-center justify-center gap-2 bg-[#003942] rounded-2xl shadow px-4 py-3 text-white font-semibold text-sm hover:bg-[#002a31] transition">
+            <span class="material-symbols-outlined text-sm">add</span>
+            Publicar
+        </a>
     </div>
 
     <!-- Busqueda -->
@@ -60,6 +66,7 @@
     <script>
         window.APP_URL = "{{ url('/') }}";
         window.CSRF = "{{ csrf_token() }}";
+        window.AUTH_USER_ID = {{ auth()->id() }};
     </script>
     @vite('resources/js/pages/feed.js')
 @endpush

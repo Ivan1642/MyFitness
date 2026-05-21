@@ -3,7 +3,6 @@
 @section('content')
 <div class="max-w-2xl mx-auto space-y-6">
 
-    <!-- Mensaje de éxito -->
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
             {{ session('success') }}
@@ -22,15 +21,19 @@
                         alt="Avatar">
                 </div>
 
-                <button id="editBtn"
-                    class="bg-[#003942] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#002a31] transition">
-                    Editar perfil
-                </button>
+                <div class="flex gap-2">
+                    <button id="editBtn"
+                        class="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-semibold bg-[#003942] text-white hover:bg-[#002a31] transition">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                        Editar perfil
+                    </button>
 
-                <a href="{{ route('profile.feed', $user->id) }}"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white transition">
-                    Ver publicaciones
-                </a>
+                    <a href="{{ route('profile.feed', $user->id) }}"
+                        class="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-semibold border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white transition">
+                        <span class="material-symbols-outlined text-sm">grid_view</span>
+                        Publicaciones
+                    </a>
+                </div>
 
             </div>
 
@@ -74,6 +77,10 @@
                         <p class="font-bold text-[#003942] text-lg">{{ $following->count() }}</p>
                         <p class="text-gray-400">Siguiendo</p>
                     </button>
+                    <div class="text-center">
+                        <p class="font-bold text-[#003942] text-lg">{{ $totalLikes }}</p>
+                        <p class="text-gray-400">Me gusta</p>
+                    </div>
                 </div>
             </div>
 
@@ -149,7 +156,12 @@
     <!-- Logros -->
     @if($achievements->count())
         <div class="bg-white rounded-2xl shadow p-6">
-            <h2 class="text-lg font-bold text-[#003942] mb-4">Logros conseguidos</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-[#003942]">Logros conseguidos</h2>
+                <span class="text-sm text-gray-400 font-semibold">
+                    {{ $achievements->count() }}/{{ count((new \App\Services\AchievementService())->getDefinitions()) }}
+                </span>
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 @foreach($achievements as $achievement)
                     <div class="bg-[#003942]/5 border border-[#003942]/20 rounded-xl p-3 text-center">

@@ -15,22 +15,29 @@
                     class="h-24 w-24 rounded-full border-4 border-white object-cover shadow"
                     alt="Avatar">
 
-                <!-- Botón seguir/dejar de seguir -->
-                @if(auth()->id() !== $user->id)
-                    <form method="POST" action="{{ route('profile.follow', $user->id) }}">
-                        @csrf
-                        <button type="submit"
-                            class="px-4 py-2 rounded-xl text-sm font-semibold transition
-                            {{ $isFollowing ? 'border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white' : 'bg-[#003942] text-white hover:bg-[#002a31]' }}">
-                            {{ $isFollowing ? 'Dejar de seguir' : 'Seguir' }}
-                        </button>
-                    </form>
-                @endif
+                <div class="flex gap-2">
+                    @if(auth()->id() !== $user->id)
+                        <form method="POST" action="{{ route('profile.follow', $user->id) }}">
+                            @csrf
+                            <button type="submit"
+                                class="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-semibold transition
+                                {{ $isFollowing
+                                    ? 'border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white'
+                                    : 'bg-[#003942] text-white hover:bg-[#002a31]' }}">
+                                <span class="material-symbols-outlined text-sm">
+                                    {{ $isFollowing ? 'person_remove' : 'person_add' }}
+                                </span>
+                                {{ $isFollowing ? 'Dejar de seguir' : 'Seguir' }}
+                            </button>
+                        </form>
+                    @endif
 
-                <a href="{{ route('profile.feed', $user->id) }}"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white transition">
-                    Ver publicaciones
-                </a>
+                    <a href="{{ route('profile.feed', $user->id) }}"
+                        class="flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-semibold border-2 border-[#003942] text-[#003942] hover:bg-[#003942] hover:text-white transition">
+                        <span class="material-symbols-outlined text-sm">grid_view</span>
+                        Publicaciones
+                    </a>
+                </div>
 
             </div>
 
@@ -70,6 +77,10 @@
                     <p class="font-bold text-[#003942] text-lg">{{ $following->count() }}</p>
                     <p class="text-gray-400">Siguiendo</p>
                 </button>
+                <div class="text-center">
+                    <p class="font-bold text-[#003942] text-lg">{{ $totalLikes }}</p>
+                    <p class="text-gray-400">Me gusta</p>
+                </div>
             </div>
 
         </div>
@@ -78,11 +89,18 @@
     <!-- Logros -->
     @if($achievements->count())
         <div class="bg-white rounded-2xl shadow p-6">
-            <h2 class="text-lg font-bold text-[#003942] mb-4">Logros conseguidos</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-[#003942]">Logros conseguidos</h2>
+                <span class="text-sm text-gray-400 font-semibold">
+                    {{ $achievements->count() }}/{{ count((new \App\Services\AchievementService())->getDefinitions()) }}
+                </span>
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 @foreach($achievements as $achievement)
                     <div class="bg-[#003942]/5 border border-[#003942]/20 rounded-xl p-3 text-center">
-                        <span class="material-symbols-outlined text-[#003942] text-3xl mb-1 block">emoji_events</span>
+                        <span class="material-symbols-outlined text-[#003942] text-3xl mb-1 block">
+                            emoji_events
+                        </span>
                         <p class="text-sm font-semibold text-[#003942]">{{ $achievement->name }}</p>
                         <p class="text-xs text-gray-400 mt-1">{{ $achievement->created_at->format('d/m/Y') }}</p>
                     </div>
@@ -99,7 +117,7 @@
 
 </div>
 
-<!-- seguidores -->
+<!-- Modal seguidores -->
 <div id="followersModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
         <div class="flex justify-between items-center mb-4">
@@ -122,7 +140,7 @@
     </div>
 </div>
 
-<!-- siguiendo -->
+<!-- Modal siguiendo -->
 <div id="followingModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
         <div class="flex justify-between items-center mb-4">

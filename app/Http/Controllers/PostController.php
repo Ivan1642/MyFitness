@@ -3,65 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePostRequest $request)
+    public function store(Request $request)
     {
-        //
+        $request->validate([
+            'content' => 'nullable|string|max:1000',
+            'image'   => 'nullable|image|max:5120',
+        ]);
+
+        if (!$request->input('content') && !$request->hasFile('image')) {
+            return back()->withErrors(['content' => 'Debes añadir texto o una imagen.']);
+        }
+
+        $data = [
+            'user_id' => auth()->id(),
+            'content' => $request->input('content'),
+        ];
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('posts', 'public');
+        }
+
+        Post::create($data);
+
+        return redirect()->route('feed')->with('success', 'Publicación creada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Post $post)
+    public function destroy($id)
     {
-        //
-    }
+        $post = Post::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Post $post)
-    {
-        //
-    }
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePostRequest $request, Post $post)
-    {
-        //
-    }
+        $post->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Post $post)
-    {
-        //
+        return response()->json(['ok' => true]);
     }
 }

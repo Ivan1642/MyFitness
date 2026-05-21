@@ -93,7 +93,7 @@ class FeedController extends Controller
 
     private function getParaTi($userId)
     {
-        $sessions = TrainingSession::with('user')
+        $sessions = TrainingSession::with(['user', 'sets.exercise'])
             ->where('is_finished', true)
             ->where('is_public', true)
             ->whereHas('user', fn($q) => $q->where(function($q) {
@@ -122,7 +122,7 @@ class FeedController extends Controller
 
         if ($followingIds->isEmpty()) return collect();
 
-        $sessions = TrainingSession::with('user')
+        $sessions = TrainingSession::with(['user', 'sets.exercise'])
             ->where('is_finished', true)
             ->where('is_public', true)
             ->whereIn('user_id', $followingIds)
@@ -167,13 +167,23 @@ class FeedController extends Controller
     private function formatSession($s, $userId)
     {
         [$count, $liked] = $this->getLikes($s->id, 'App\\Models\\TrainingSession', $userId);
+
+        $exercises = $s->sets->groupBy('exercise_id')->take(3)->map(function($sets) {
+            return [
+                'name'       => $sets->first()->exercise->name,
+                'sets_count' => $sets->count(),
+            ];
+        })->values();
+
         return [
             'id'            => $s->id,
+            'user_id'       => $s->user_id,
             'type'          => 'session',
             'content'       => $s->notes,
             'image'         => $s->photo ? asset('storage/' . $s->photo) : null,
             'duration'      => $s->duration,
             'created_at'    => $s->date,
+            'exercises'     => $exercises,
             'user_name'     => $s->user->name,
             'user_username' => $s->user->username,
             'user_avatar'   => $s->user->avatar ? asset('storage/' . $s->user->avatar) : asset('img/predeterminada_perfil.png'),
@@ -188,6 +198,7 @@ class FeedController extends Controller
         [$count, $liked] = $this->getLikes($p->id, 'App\\Models\\Post', $userId);
         return [
             'id'            => $p->id,
+            'user_id'       => $p->user_id,
             'type'          => 'post',
             'content'       => $p->content,
             'image'         => $p->image ? asset('storage/' . $p->image) : null,
@@ -207,6 +218,7 @@ class FeedController extends Controller
         [$count, $liked] = $this->getLikes($a->id, 'App\\Models\\Achievement', $userId);
         return [
             'id'            => $a->id,
+            'user_id'       => $a->user_id,
             'type'          => 'achievement',
             'content'       => $a->name,
             'image'         => null,
@@ -226,6 +238,7 @@ class FeedController extends Controller
         [$count, $liked] = $this->getLikes($r->id, 'App\\Models\\Record', $userId);
         return [
             'id'            => $r->id,
+            'user_id'       => $r->user_id,
             'type'          => 'record',
             'content'       => $r->exercise->name . ' — ' . $r->max_weight . ' kg',
             'image'         => null,
@@ -265,7 +278,6 @@ class FeedController extends Controller
                 'id_usuario'    => auth()->id(),
                 'likeable_id'   => $request->likeable_id,
                 'likeable_type' => $request->likeable_type,
-                'fecha'         => now(),
                 'created_at'    => now(),
                 'updated_at'    => now(),
             ]);

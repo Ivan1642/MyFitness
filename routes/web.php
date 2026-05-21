@@ -9,6 +9,7 @@ use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\PostController;
 
 //landing sin loguear
 Route::get('/', function () {
@@ -57,6 +58,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/{id}/follow', [ProfileController::class, 'follow'])->name('profile.follow');
     Route::get('/profile/{id}/feed', [ProfileController::class, 'feed'])->name('profile.feed');
     Route::get('/profile/{id}/feed/load', [FeedController::class, 'loadProfile'])->name('profile.feed.load');
+    Route::get('/posts/crear', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
 
 //API ejercicios

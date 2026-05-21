@@ -14,8 +14,9 @@ class ProfileController extends Controller
         $followers = $user->followers()->with('follower')->get();
         $following = $user->following()->with('following')->get();
         $achievements = $user->achievements()->orderByDesc('created_at')->get();
+        $totalLikes = $this->getTotalLikes($user);
 
-        return view('profile.index', compact('user', 'followers', 'following', 'achievements'));
+        return view('profile.index', compact('user', 'followers', 'following', 'achievements', 'totalLikes'));
     }
 
     public function update(Request $request)
@@ -53,16 +54,21 @@ class ProfileController extends Controller
 
     public function show($id)
     {
-        $user = User::findOrFail($id);
+        if (auth()->id() == $id) {
+            return redirect()->route('profile');
+        }
+
+        $user = \App\Models\User::findOrFail($id);
         $followers = $user->followers()->with('follower')->get();
         $following = $user->following()->with('following')->get();
         $achievements = $user->achievements()->orderByDesc('created_at')->get();
+        $totalLikes = $this->getTotalLikes($user);
 
         $isFollowing = auth()->user()->following()
             ->where('following_id', $id)
             ->exists();
 
-        return view('profile.show', compact('user', 'followers', 'following', 'achievements', 'isFollowing'));
+        return view('profile.show', compact('user', 'followers', 'following', 'achievements', 'isFollowing', 'totalLikes'));
     }
 
     public function follow($id)
@@ -91,5 +97,32 @@ class ProfileController extends Controller
     {
         $user = User::findOrFail($id);
         return view('profile.feed', compact('user'));
+    }
+
+    private function getTotalLikes($user)
+    {
+        $postIds = $user->posts()->pluck('id');
+        $sessionIds = $user->trainingSessions()->pluck('id');
+        $achievementIds = $user->achievements()->pluck('id');
+        $recordIds = $user->records()->pluck('id');
+
+        return \DB::table('routine_likes')
+            ->where(function($q) use ($postIds) {
+                $q->where('likeable_type', 'App\\Models\\Post')
+                ->whereIn('likeable_id', $postIds);
+            })
+            ->orWhere(function($q) use ($sessionIds) {
+                $q->where('likeable_type', 'App\\Models\\TrainingSession')
+                ->whereIn('likeable_id', $sessionIds);
+            })
+            ->orWhere(function($q) use ($achievementIds) {
+                $q->where('likeable_type', 'App\\Models\\Achievement')
+                ->whereIn('likeable_id', $achievementIds);
+            })
+            ->orWhere(function($q) use ($recordIds) {
+                $q->where('likeable_type', 'App\\Models\\Record')
+                ->whereIn('likeable_id', $recordIds);
+            })
+            ->count();
     }
 }
