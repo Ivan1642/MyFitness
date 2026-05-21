@@ -8,12 +8,17 @@
         </a>
 
         @auth
-            <nav class="hidden md:flex space-x-6">
+            <nav class="hidden md:flex space-x-6 items-center">
                 <a href="{{ route('dashboard') }}" class="hover:text-black hover:underline">Inicio</a>
                 <a href="{{ route('routines.index') }}" class="hover:text-black hover:underline">Rutinas</a>
                 <a href="{{ route('progress.index') }}" class="hover:text-black hover:underline">Progreso</a>
                 <a href="{{ route('feed') }}" class="hover:text-black hover:underline">Feed</a>
-                <a href="" class="hover:text-black hover:underline">Notificaciones</a>
+                <a href="{{ route('notifications.index') }}" class="relative hover:text-black">
+                    Notificaciones
+                    <span id="notif-count"
+                        class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full h-4 w-4 items-center justify-center hidden">
+                    </span>
+                </a>
                 @if(auth()->user()->is_admin)
                     <a href="{{ route('admin.index') }}" class="hover:text-black hover:underline">Panel de Admin</a>
                 @endif
@@ -67,7 +72,7 @@
                         <a href="{{ route('feed') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Feed
                         </a>
-                        <a href="" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <a href="{{ route('notifications.index') }}" class="block md:hidden px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             Notificaciones
                         </a>
                         <a href="{{ route('profile') }}" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">

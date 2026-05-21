@@ -284,13 +284,24 @@ class FeedController extends Controller
             ]);
             $liked = true;
 
-            $ownerUserId = DB::table(str_replace('App\\Models\\', '', strtolower($request->likeable_type)) . 's')
-                ->where('id', $request->likeable_id)
-                ->value('user_id');
+            $tableMap = [
+                'App\\Models\\Post'            => 'posts',
+                'App\\Models\\TrainingSession' => 'training_sessions',
+                'App\\Models\\Achievement'     => 'achievements',
+                'App\\Models\\Record'          => 'records',
+            ];
 
-            if ($ownerUserId && $ownerUserId !== auth()->id()) {
-                $owner = User::find($ownerUserId);
-                (new NotificationService())->newLike($owner, auth()->user(), $request->likeable_id, $request->likeable_type);
+            $table = $tableMap[$request->likeable_type] ?? null;
+
+            if ($table) {
+                $ownerUserId = DB::table($table)
+                    ->where('id', $request->likeable_id)
+                    ->value('user_id');
+
+                if ($ownerUserId && $ownerUserId !== auth()->id()) {
+                    $owner = User::find($ownerUserId);
+                    (new NotificationService())->newLike($owner, auth()->user(), $request->likeable_id, $request->likeable_type);
+                }
             }
         }
 

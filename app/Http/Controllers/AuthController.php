@@ -14,6 +14,7 @@ class AuthController extends Controller
     {
         return view('auth.register');
     }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -21,6 +22,16 @@ class AuthController extends Controller
             'username' => 'required|string|max:30|unique:users|alpha_dash',
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
+        ], [
+            'name.required'       => 'El nombre es obligatorio.',
+            'username.required'   => 'El nombre de usuario es obligatorio.',
+            'username.unique'     => 'Ese nombre de usuario ya está en uso.',
+            'username.alpha_dash' => 'El nombre de usuario solo puede contener letras, números, guiones y guiones bajos.',
+            'email.required'      => 'El email es obligatorio.',
+            'email.unique'        => 'Ese email ya está registrado.',
+            'password.required'   => 'La contraseña es obligatoria.',
+            'password.min'        => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.confirmed'  => 'Las contraseñas no coinciden.',
         ]);
 
         $user = User::create([
@@ -43,8 +54,12 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
+            'email'    => 'required|email',
+            'password' => 'required',
+        ], [
+            'email.required'    => 'El email es obligatorio.',
+            'email.email'       => 'Introduce un email válido.',
+            'password.required' => 'La contraseña es obligatoria.',
         ]);
 
         if (Auth::attempt($credentials)) {
@@ -53,8 +68,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Contraseña o email incorrecta/o',
-        ]);
+            'email' => 'Contraseña o email incorrectos.',
+        ])->withInput();
     }
 
     public function logout(Request $request)
