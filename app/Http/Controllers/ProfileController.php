@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Services\NotificationService;
+use App\Services\AchievementService;
 
 class ProfileController extends Controller
 {
@@ -58,7 +60,7 @@ class ProfileController extends Controller
             return redirect()->route('profile');
         }
 
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
         $followers = $user->followers()->with('follower')->get();
         $following = $user->following()->with('following')->get();
         $achievements = $user->achievements()->orderByDesc('created_at')->get();
@@ -87,7 +89,10 @@ class ProfileController extends Controller
                 'following_id' => $id,
             ]);
 
-            (new \App\Services\AchievementService())->check($user);
+            $followed = User::find($id);
+            (new NotificationService())->newFollower($followed, $user);
+
+            (new AchievementService())->check($user);
         }
 
         return redirect()->route('profile.show', $id);

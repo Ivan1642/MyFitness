@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\TrainingSession;
 use App\Models\Achievement;
 use App\Models\Record;
+use App\Services\NotificationService;
 
 class FeedController extends Controller
 {
@@ -282,6 +283,15 @@ class FeedController extends Controller
                 'updated_at'    => now(),
             ]);
             $liked = true;
+
+            $ownerUserId = DB::table(str_replace('App\\Models\\', '', strtolower($request->likeable_type)) . 's')
+                ->where('id', $request->likeable_id)
+                ->value('user_id');
+
+            if ($ownerUserId && $ownerUserId !== auth()->id()) {
+                $owner = User::find($ownerUserId);
+                (new NotificationService())->newLike($owner, auth()->user(), $request->likeable_id, $request->likeable_type);
+            }
         }
 
         $count = DB::table('routine_likes')

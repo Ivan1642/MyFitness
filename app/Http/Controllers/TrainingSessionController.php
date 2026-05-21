@@ -83,8 +83,12 @@ class TrainingSessionController extends Controller
                 'exercise_id' => $request->exercise_id,
                 'max_weight'  => $request->weight,
             ]);
+            $exercise = \App\Models\Exercise::find($request->exercise_id);
+            (new \App\Services\NotificationService())->newPR(auth()->user(), $exercise);
         } elseif ($request->weight > $record->max_weight) {
             $record->update(['max_weight' => $request->weight]);
+            $exercise = \App\Models\Exercise::find($request->exercise_id);
+            (new \App\Services\NotificationService())->newPR(auth()->user(), $exercise);
         }
 
         (new \App\Services\AchievementService())->check(auth()->user());

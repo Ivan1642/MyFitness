@@ -103,6 +103,8 @@ class AchievementService
             'name'    => $this->definitions[$slug],
         ]);
 
+        (new \App\Services\NotificationService())->newAchievement($user, $this->definitions[$slug], $slug);
+
         return true;
     }
 
