@@ -6,6 +6,10 @@ use App\Models\TrainingSession;
 use App\Models\Set;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Record;
+use App\Models\Exercise;
+use App\Services\NotificationService;
+use App\Services\AchievementService;
 
 class TrainingSessionController extends Controller
 {
@@ -73,25 +77,25 @@ class TrainingSessionController extends Controller
             'weight'              => $request->weight,
         ]);
 
-        $record = \App\Models\Record::where('user_id', auth()->id())
+        $record = Record::where('user_id', auth()->id())
             ->where('exercise_id', $request->exercise_id)
             ->first();
 
         if (!$record) {
-            \App\Models\Record::create([
+            Record::create([
                 'user_id'     => auth()->id(),
                 'exercise_id' => $request->exercise_id,
                 'max_weight'  => $request->weight,
             ]);
-            $exercise = \App\Models\Exercise::find($request->exercise_id);
-            (new \App\Services\NotificationService())->newPR(auth()->user(), $exercise);
+            $exercise = Exercise::find($request->exercise_id);
+            (new NotificationService())->newPR(auth()->user(), $exercise);
         } elseif ($request->weight > $record->max_weight) {
             $record->update(['max_weight' => $request->weight]);
-            $exercise = \App\Models\Exercise::find($request->exercise_id);
-            (new \App\Services\NotificationService())->newPR(auth()->user(), $exercise);
+            $exercise = Exercise::find($request->exercise_id);
+            (new NotificationService())->newPR(auth()->user(), $exercise);
         }
 
-        (new \App\Services\AchievementService())->check(auth()->user());
+        (new AchievementService())->check(auth()->user());
 
         return response()->json(['ok' => true, 'set_id' => $set->id]);
     }
@@ -124,7 +128,7 @@ class TrainingSessionController extends Controller
 
         \Log::info('Update ejecutado', ['result' => $result, 'is_finished_despues' => $session->fresh()->is_finished]);
 
-        (new \App\Services\AchievementService())->check(auth()->user());
+        (new AchievementService())->check(auth()->user());
 
         return response()->json(['ok' => true]);
     }

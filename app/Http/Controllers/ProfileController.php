@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Services\NotificationService;
 use App\Services\AchievementService;
+use App\Models\Follower;
 
 class ProfileController extends Controller
 {
@@ -80,11 +81,11 @@ class ProfileController extends Controller
         $existing = $user->following()->where('following_id', $id)->first();
 
         if ($existing) {
-            \App\Models\Follower::where('follower_id', $user->id)
+            Follower::where('follower_id', $user->id)
                 ->where('following_id', $id)
                 ->delete();
         } else {
-            \App\Models\Follower::create([
+            Follower::create([
                 'follower_id'  => $user->id,
                 'following_id' => $id,
             ]);

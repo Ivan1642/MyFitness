@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Routine;
 use App\Models\RoutineSet;
 use App\Models\TrainingSession;
-use App\Models\Set;
+use App\Models\Exercise;
 use Illuminate\Http\Request;
 
 class RoutineController extends Controller
@@ -22,7 +22,7 @@ class RoutineController extends Controller
             return redirect()->route('routines.index')->with('error', 'Has alcanzado el límite de 4 rutinas.');
         }
 
-        $exercises = \App\Models\Exercise::select('id', 'name', 'muscle_group')->orderBy('name')->get();
+        $exercises = Exercise::select('id', 'name', 'muscle_group')->orderBy('name')->get();
         return view('routines.create', compact('exercises'));
     }
 
@@ -69,7 +69,7 @@ class RoutineController extends Controller
             ->with(['routineSets.exercise'])
             ->firstOrFail();
 
-        $exercises = \App\Models\Exercise::select('id', 'name', 'muscle_group')->orderBy('name')->get();
+        $exercises = Exercise::select('id', 'name', 'muscle_group')->orderBy('name')->get();
 
         $routineData = $routine->routineSets->groupBy('exercise_id')->map(function($sets) {
             return [

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Achievement;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Models\Set;
 
 class AchievementService
 {
@@ -103,7 +104,7 @@ class AchievementService
             'name'    => $this->definitions[$slug],
         ]);
 
-        (new \App\Services\NotificationService())->newAchievement($user, $this->definitions[$slug], $slug);
+        (new NotificationService())->newAchievement($user, $this->definitions[$slug], $slug);
 
         return true;
     }
@@ -198,7 +199,7 @@ class AchievementService
 
     private function checkRepWeight(User $user): void
     {
-        $maxWeight = \App\Models\Set::whereHas('trainingSession', function($q) use ($user) {
+        $maxWeight = Set::whereHas('trainingSession', function($q) use ($user) {
             $q->where('user_id', $user->id)->where('is_finished', true);
         })->where('repetitions', 1)->max('weight');
 
@@ -211,7 +212,7 @@ class AchievementService
 
     private function checkSetVolume(User $user): void
     {
-        $sets = \App\Models\Set::whereHas('trainingSession', function($q) use ($user) {
+        $sets = Set::whereHas('trainingSession', function($q) use ($user) {
             $q->where('user_id', $user->id)->where('is_finished', true);
         })->get();
 
@@ -227,7 +228,7 @@ class AchievementService
 
     private function checkMuscleGroups(User $user): void
     {
-        $groups = \App\Models\Set::whereHas('trainingSession', function($q) use ($user) {
+        $groups = Set::whereHas('trainingSession', function($q) use ($user) {
             $q->where('user_id', $user->id)->where('is_finished', true);
         })->with('exercise')->get()->pluck('exercise.muscle_group')->unique()->count();
 
